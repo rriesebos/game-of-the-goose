@@ -1,0 +1,21 @@
+{
+  "name": "game-of-the-goose",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html --open",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "browserslist": "defaults and supports async-functions",
+  "keywords": [],
+  "author": "Robert Riesebos",
+  "license": "ISC",
+  "dependencies": {
+    "boardgame.io": "^0.47.1",
+    "src": "^1.1.2"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5"
+  }
+}
