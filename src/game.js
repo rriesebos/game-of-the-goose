@@ -7,13 +7,14 @@ const TILE_EVENT_MAP = {
     3: (G, ctx) => {
         let tileNumber = G.players[ctx.currentPlayer].tileNumber;
 
-        let nextPlayerTileNumber = 0;
+        let nextPlayerTileNumber = 0, distanceToNextPlayer = MAX_MOVE_COUNT;
         for (const player of Object.values(G.players)) {
             if (player.id === ctx.currentPlayer || player.tileNumber === 0) {
                 continue;
             }
 
-            if (player.tileNumber > tileNumber && player.tileNumber - tileNumber > nextPlayerTileNumber) {
+            if (player.tileNumber > tileNumber && player.tileNumber - tileNumber < distanceToNextPlayer) {
+                distanceToNextPlayer = player.tileNumber - tileNumber;
                 nextPlayerTileNumber = player.tileNumber;
             }
         }
@@ -75,7 +76,7 @@ export const GooseGame = {
 
     moves: {
         rollDice: (G, ctx) => {
-            // Check if the players has to skip a turn
+            // Check if the player has to skip a turn
             if (G.players[ctx.currentPlayer].skipTurns > 0) {
                 G.players[ctx.currentPlayer].skipTurns--;
 
