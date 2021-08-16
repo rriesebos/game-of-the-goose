@@ -9,7 +9,7 @@ body {
 
 :root {
     --tile-curve: 50%;
-    --board-rotation: 60deg;
+    --board-rotation: 55deg;
 }
 
 .app-container {
