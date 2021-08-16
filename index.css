@@ -13,20 +13,25 @@ body {
 }
 
 .app-container {
-    background: #b6efd48e;
     display: flex;
     place-content: center;
     height: 100vh;
+    background: #b6efd48e;
 }
 
 .board {
     flex-grow: 1;
     display: grid;
-    margin: 0 15%;
     grid-template-columns: repeat(12, 1fr);
     row-gap: 10px;
     column-gap: 8px;
+    padding: 20px;
+    margin: 0 15%;
+    background: #ffde82;
+    border: 1px solid black;
+    border-radius: 2%;
     transform: perspective(2000px) rotateX(var(--board-rotation));
+    box-shadow: 4px 6px 4px 1px rgba(0, 0, 0, 0.2);
 }
 
 .space {
@@ -38,12 +43,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 4px;
     background: #058C42;
     color: white;
-    padding: 4px;
+    border: 1px solid black;
     font-size: max(2vw, 2vh);
     font-weight: bold;
-    box-shadow: 4px 6px 4px 1px rgba(0, 0, 0, 0.2);
 }
 
 .tile.special {
