@@ -12,6 +12,7 @@ body {
 }
 
 .app-container {
+    background: #b6efd48e;
     display: flex;
     place-content: center;
     height: 100vh;
@@ -22,9 +23,9 @@ body {
     display: grid;
     margin: 0 15%;
     grid-template-columns: repeat(12, 1fr);
-    row-gap: 4px;
-    column-gap: 2px;
-    transform: perspective(2000px) rotateX(60deg);
+    row-gap: 10px;
+    column-gap: 8px;
+    transform: perspective(2000px) rotateX(65deg);
 }
 
 .space {
@@ -36,41 +37,42 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 4px;
+    background: #058C42;
     color: white;
+    padding: 4px;
     font-size: max(2vw, 2vh);
     font-weight: bold;
-    background: green;
+    box-shadow: 4px 6px 4px 1px rgba(0, 0, 0, 0.2);
 }
 
 .tile.special {
-    background: red;
+    background: #E23742;
 }
 
 #tile0 {
     border-radius: 10px 0 0 10px;
 }
 
-#tile33 {
+#tile63 {
     border-radius: 0 10px 10px 0;
 }
 
 #tile11,
-#tile22 {
+#tile41 {
     border-radius: 0 var(--tile-curve) 0 0;
 }
 
-#tile12,
-#tile25 {
+#tile31,
+#tile55 {
     border-radius: var(--tile-curve) 0 0 0;
 }
 
-#tile71,
-#tile58 {
+#tile16,
+#tile44 {
     border-radius: 0 0 var(--tile-curve) 0;
 }
 
-#tile49,
-#tile60 {
+#tile27,
+#tile53 {
     border-radius: 0 0 0 var(--tile-curve);
 }
