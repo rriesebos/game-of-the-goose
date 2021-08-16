@@ -9,6 +9,7 @@ body {
 
 :root {
     --tile-curve: 50%;
+    --board-rotation: 60deg;
 }
 
 .app-container {
@@ -25,7 +26,7 @@ body {
     grid-template-columns: repeat(12, 1fr);
     row-gap: 10px;
     column-gap: 8px;
-    transform: perspective(2000px) rotateX(65deg);
+    transform: perspective(2000px) rotateX(var(--board-rotation));
 }
 
 .space {
