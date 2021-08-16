@@ -32,5 +32,5 @@ class GoosGameClient {
     }
 }
 
-const appElement = document.getElementById('app');
+const appElement = document.getElementById('app-container');
 const app = new GoosGameClient(appElement);

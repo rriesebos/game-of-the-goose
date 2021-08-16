@@ -1,0 +1,76 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --tile-curve: 50%;
+}
+
+.app-container {
+    display: flex;
+    place-content: center;
+    height: 100vh;
+}
+
+.board {
+    flex-grow: 1;
+    display: grid;
+    margin: 0 15%;
+    grid-template-columns: repeat(12, 1fr);
+    row-gap: 4px;
+    column-gap: 2px;
+    transform: perspective(2000px) rotateX(60deg);
+}
+
+.space {
+    background: white;
+    visibility: hidden;
+}
+
+.tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    color: white;
+    font-size: max(2vw, 2vh);
+    font-weight: bold;
+    background: green;
+}
+
+.tile.special {
+    background: red;
+}
+
+#tile0 {
+    border-radius: 10px 0 0 10px;
+}
+
+#tile33 {
+    border-radius: 0 10px 10px 0;
+}
+
+#tile11,
+#tile22 {
+    border-radius: 0 var(--tile-curve) 0 0;
+}
+
+#tile12,
+#tile25 {
+    border-radius: var(--tile-curve) 0 0 0;
+}
+
+#tile71,
+#tile58 {
+    border-radius: 0 0 var(--tile-curve) 0;
+}
+
+#tile49,
+#tile60 {
+    border-radius: 0 0 0 var(--tile-curve);
+}
