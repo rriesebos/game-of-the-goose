@@ -14,13 +14,8 @@ class GoosGameClient {
 
         this.rootElement = rootElement;
 
-        this.createBoard();
         this.attachListeners();
         this.client.subscribe(state => this.update(state));
-    }
-
-    createBoard() {
-        // TODO: Create/initialize board
     }
 
     attachListeners() {
@@ -28,9 +23,21 @@ class GoosGameClient {
     }
 
     update(state) {
-        // TODO: Update the board when the game state changes
+        const tiles = this.rootElement.querySelectorAll('.tile');
+        tiles.forEach(tile => {
+            tile.style.color = 'white';
+        });
+
+        for (const [id, player] of Object.entries(state.G.players)) {
+            const newTile = this.rootElement.querySelector(`[data-id='${player.tileNumber}']`);
+            if (id === '0') {
+                newTile.style.color = 'red';
+            } else {
+                newTile.style.color = 'blue';
+            }
+        }
     }
 }
 
-const appElement = document.getElementById('app-container');
+const appElement = document.querySelector('.app-container');
 const app = new GoosGameClient(appElement);
