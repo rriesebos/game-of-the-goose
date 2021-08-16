@@ -28,7 +28,7 @@ body {
     padding: 20px;
     margin: 0 15%;
     background: #ffde82;
-    border: 1px solid black;
+    border: 12px solid #8E6E53;
     border-radius: 2%;
     transform: perspective(2000px) rotateX(var(--board-rotation));
     box-shadow: 4px 6px 4px 1px rgba(0, 0, 0, 0.2);
