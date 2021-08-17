@@ -34,9 +34,12 @@ body {
     box-shadow: 4px 6px 4px 1px rgba(0, 0, 0, 0.2);
 }
 
-.space {
-    background: white;
-    visibility: hidden;
+#space {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    grid-column: span 8;
 }
 
 .tile {
