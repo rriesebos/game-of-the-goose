@@ -7,7 +7,8 @@ const TILE_EVENT_MAP = {
     3: (G, ctx) => {
         let tileNumber = G.players[ctx.currentPlayer].tileNumber;
 
-        let nextPlayerTileNumber = 0, distanceToNextPlayer = MAX_MOVE_COUNT;
+        let nextPlayerTileNumber = 0;
+        let distanceToNextPlayer = MAX_MOVE_COUNT;
         for (const player of Object.values(G.players)) {
             if (player.id === ctx.currentPlayer || player.tileNumber === 0) {
                 continue;
@@ -57,6 +58,8 @@ const TILE_EVENT_MAP = {
 };
 
 export const GooseGame = {
+    name: 'game-of-the-goose',
+
     setup: (ctx) => {
         let players = {};
         for (let i = 0; i < ctx.numPlayers; i++) {
