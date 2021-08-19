@@ -32,13 +32,14 @@ body {
     border-radius: 2%;
     transform: perspective(2000px) rotateX(var(--board-rotation));
     box-shadow: 4px 6px 4px 1px rgba(0, 0, 0, 0.2);
+    transform-style: preserve-3d;
 }
 
 #space {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2em;
+    font-size: max(2vw, 2vh);
     grid-column: span 8;
 }
 
@@ -52,6 +53,15 @@ body {
     border: 1px solid black;
     font-size: max(2vw, 2vh);
     font-weight: bold;
+    transform-style: preserve-3d;
+}
+
+.player {
+    position: absolute;
+    width: 100%;
+    min-width: 30px;
+    z-index: 100;
+    transform: perspective(2000px) rotateX(-75deg) translateY(-50%) translateX(5px);
 }
 
 .tile.special {
@@ -84,4 +94,45 @@ body {
 #tile27,
 #tile53 {
     border-radius: 0 0 0 var(--tile-curve);
+}
+
+
+/* Rotate player image to the left */
+
+#tile11>.player,
+#tile12>.player,
+#tile13>.player,
+#tile14>.player,
+#tile15>.player,
+#tile11>.player,
+#tile12>.player,
+#tile13>.player,
+#tile14>.player,
+#tile15>.player,
+#tile16>.player,
+#tile17>.player,
+#tile18>.player,
+#tile19>.player,
+#tile20>.player,
+#tile21>.player,
+#tile22>.player,
+#tile23>.player,
+#tile24>.player,
+#tile25>.player,
+#tile26>.player,
+#tile27>.player,
+#tile41>.player,
+#tile42>.player,
+#tile43>.player,
+#tile44>.player,
+#tile45>.player,
+#tile46>.player,
+#tile47>.player,
+#tile48>.player,
+#tile49>.player,
+#tile50>.player,
+#tile51>.player,
+#tile52>.player,
+#tile53>.player {
+    transform: scaleX(-1) perspective(2000px) rotateX(-70deg) translateY(-50%);
 }
