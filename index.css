@@ -7,6 +7,40 @@ body {
     padding: 0;
 }
 
+#roll-button {
+    position: relative;
+    top: 5rem;
+    background-color: #f14e4e;
+    align-self: center;
+    display: inline-block;
+    padding: 0.3em 1.6em;
+    border: 0.2em solid rgba(255, 255, 255, 0);
+    border-radius: 0.6em;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: 1.5em;
+    color: white;
+    text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
+    text-align: center;
+    transition: border-color 0.2s, background-color 0.1s, color 0.1s;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+#roll-button:hover {
+    border-color: rgba(255, 255, 255, 1);
+}
+
+#roll-button:active {
+    top: 5.2rem;
+}
+
+#roll-button:disabled {
+    top: 5rem;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #666;
+}
+
 :root {
     --tile-curve: 50%;
     --board-rotation: 55deg;
@@ -14,6 +48,7 @@ body {
 
 .app-container {
     display: flex;
+    flex-direction: column;
     place-content: center;
     height: 100vh;
     background: #b6efd48e;
@@ -30,9 +65,9 @@ body {
     background: #ffde82;
     border: 12px solid #8E6E53;
     border-radius: 2%;
+    transform-style: preserve-3d;
     transform: perspective(2000px) rotateX(var(--board-rotation));
     box-shadow: 4px 6px 4px 1px rgba(0, 0, 0, 0.2);
-    transform-style: preserve-3d;
 }
 
 #space {
@@ -41,9 +76,11 @@ body {
     align-items: center;
     font-size: max(2vw, 2vh);
     grid-column: span 8;
+    transform: perspective(2000px) rotateX(-20deg) translateY(-25%);
 }
 
 .tile {
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;

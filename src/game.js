@@ -78,7 +78,7 @@ export const GooseGame = {
     },
 
     moves: {
-        rollDice: (G, ctx) => {
+        rollDice: (G, ctx, value) => {
             // Check if the player has to skip a turn
             if (G.players[ctx.currentPlayer].skipTurns > 0) {
                 G.players[ctx.currentPlayer].skipTurns--;
@@ -88,7 +88,12 @@ export const GooseGame = {
             }
 
             // Roll a six-faced die
-            G.die = ctx.random.D6();
+            if (value) {
+                G.die = value;
+            } else {
+                G.die = ctx.random.D6();
+            }
+
             ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.die}`);
 
             // Check if the player is stuck in the well, free player if they throw a 6
