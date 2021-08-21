@@ -38,9 +38,10 @@ body {
     font-weight: 500;
     font-size: 2em;
     color: white;
+    text-align: center;
     text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
     z-index: 300;
-    transition: opacity linear 0.1s;
+    transition: opacity linear 0.2s;
 }
 
 #confetti-canvas {
