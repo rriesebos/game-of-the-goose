@@ -1,75 +1,111 @@
 const MAX_MOVE_COUNT = 63;
 
-const MOVE_AGAIN_TILES = [1, 5, 10, 23, 32, 41, 45, 54, 59];
+export const MOVE_AGAIN_TILES = [1, 5, 10, 23, 32, 41, 45, 54, 59];
 
-const TILE_EVENT_MAP = {
+export const TILE_EVENT_MAP = {
     // Move player in front of the next player
-    3: (G, ctx) => {
-        let tileNumber = G.players[ctx.currentPlayer].tileNumber;
+    3: {
+        event: (G, ctx) => {
+            let tileNumber = G.players[ctx.currentPlayer].tileNumber;
 
-        let nextPlayerTileNumber = 0;
-        let distanceToNextPlayer = MAX_MOVE_COUNT;
-        for (const player of Object.values(G.players)) {
-            if (player.id === ctx.currentPlayer || player.tileNumber === 0) {
-                continue;
+            let nextPlayerTileNumber = 0;
+            let distanceToNextPlayer = MAX_MOVE_COUNT;
+            for (const player of Object.values(G.players)) {
+                if (player.id === ctx.currentPlayer || player.tileNumber === 0) {
+                    continue;
+                }
+
+                if (player.tileNumber > tileNumber && player.tileNumber - tileNumber < distanceToNextPlayer) {
+                    distanceToNextPlayer = player.tileNumber - tileNumber;
+                    nextPlayerTileNumber = player.tileNumber;
+                }
             }
 
-            if (player.tileNumber > tileNumber && player.tileNumber - tileNumber < distanceToNextPlayer) {
-                distanceToNextPlayer = player.tileNumber - tileNumber;
-                nextPlayerTileNumber = player.tileNumber;
+            if (nextPlayerTileNumber > 0) {
+                G.players[ctx.currentPlayer].moveList.push([tileNumber, nextPlayerTileNumber + 1]);
+                G.players[ctx.currentPlayer].tileNumber = nextPlayerTileNumber + 1;
             }
-        }
-
-        if (nextPlayerTileNumber > 0) {
-            G.players[ctx.currentPlayer].moveList.push([tileNumber, nextPlayerTileNumber + 1]);
-            G.players[ctx.currentPlayer].tileNumber = nextPlayerTileNumber + 1;
-        }
+        },
+        text: `Leapfrog: Move in front of the next player!`
     },
 
     // Move ahead to tile 12
-    6: (G, ctx) => {
-        G.players[ctx.currentPlayer].moveList.push([6, 12]);
-        G.players[ctx.currentPlayer].tileNumber = 12;
+    6: {
+        event: (G, ctx) => {
+            G.players[ctx.currentPlayer].moveList.push([6, 12]);
+            G.players[ctx.currentPlayer].tileNumber = 12;
+        },
+        text: `Bridge: You can cross the river, continue to tile 12!`
     },
 
     // Move back to tile 9
-    15: (G, ctx) => {
-        G.players[ctx.currentPlayer].moveList.push([15, 9]);
-        G.players[ctx.currentPlayer].tileNumber = 9;
+    15: {
+        event: (G, ctx) => {
+            G.players[ctx.currentPlayer].moveList.push([15, 9]);
+            G.players[ctx.currentPlayer].tileNumber = 9;
+        },
+        text: `Birdcage: A bird has escaped! To catch it, move back to tile 9.`
     },
 
     // Skip the next turn
-    19: (G, ctx) => G.players[ctx.currentPlayer].skipTurns = 1,
+    19: {
+        event: (G, ctx) => {
+            G.players[ctx.currentPlayer].skipTurns = 1;
+        },
+        text: `Hotel: Tired of the journey, you stay a night in the hotel. Skip one turn.`
+    },
 
     // Throw again if the last throw was either 1 or 2
-    26: (G, ctx) => {
-        if (G.die === 1 || G.die === 2) {
-            ctx.events.endTurn({ next: ctx.currentPlayer });
-        }
+    26: {
+        event: (G, ctx) => {
+            if (G.die === 1 || G.die === 2) {
+                ctx.events.endTurn({ next: ctx.currentPlayer });
+            }
+        },
+        text: `Dice: You threw 1 or 2, throw again!`
     },
 
     // Player falls in the well
-    31: (G, ctx) => G.players[ctx.currentPlayer].stuckInWell = true,
+    31: {
+        event: (G, ctx) => {
+            G.players[ctx.currentPlayer].stuckInWell = true;
+        },
+        text: `The well: You fell into the well! You may only continue after you roll 6.`
+    },
 
     // Move back to tile 33
-    39: (G, ctx) => {
-        G.players[ctx.currentPlayer].moveList.push([39, 33]);
-        G.players[ctx.currentPlayer].tileNumber = 33;
+    39: {
+        event: (G, ctx) => {
+            G.players[ctx.currentPlayer].moveList.push([39, 33]);
+            G.players[ctx.currentPlayer].tileNumber = 33;
+        },
+        text: `Stairs: Dummy! You fell off the stairs, go back to tile 33.`
     },
 
     // Move back to tile 30
-    42: (G, ctx) => {
-        G.players[ctx.currentPlayer].moveList.push([42, 30]);
-        G.players[ctx.currentPlayer].tileNumber = 30;
+    42: {
+        event: (G, ctx) => {
+            G.players[ctx.currentPlayer].moveList.push([42, 30]);
+            G.players[ctx.currentPlayer].tileNumber = 30;
+        },
+        text: `Maze: Now you also got lost in the maze! Go back to tile 30.`
     },
 
     // Skip the next 2 turns
-    52: (G, ctx) => G.players[ctx.currentPlayer].skipTurns = 2,
+    52: {
+        event: (G, ctx) => {
+            G.players[ctx.currentPlayer].skipTurns = 2;
+        },
+        text: `Prison: And now you're going to jail?! Skip two turns!`
+    },
 
     // Move back to tile 0 (the starting tile)
-    58: (G, ctx) => {
-        G.players[ctx.currentPlayer].moveList.push([58, 0]);
-        G.players[ctx.currentPlayer].tileNumber = 0;
+    58: {
+        event: (G, ctx) => {
+            G.players[ctx.currentPlayer].moveList.push([58, 0]);
+            G.players[ctx.currentPlayer].tileNumber = 0;
+        },
+        text: `Graveyard: Your life has come to an end, but you get a second chance. Start again on tile 0.`
     },
 };
 
@@ -80,7 +116,7 @@ export const GooseGame = {
         let players = {};
         for (let i = 0; i < ctx.numPlayers; i++) {
             players[i.toString()] = {
-                name: "Player " + i,
+                name: 'Player ' + i,
                 tileNumber: 0,
                 moveList: [],
                 skipTurns: 0,
@@ -92,6 +128,7 @@ export const GooseGame = {
             die: null,
             rollDice: false,
             players: players,
+            infoText: '',
         }
     },
 
@@ -105,6 +142,8 @@ export const GooseGame = {
             // Check if the player has to skip a turn
             if (G.players[ctx.currentPlayer].skipTurns > 0) {
                 G.players[ctx.currentPlayer].skipTurns--;
+
+                G.infoText = "Skipped turn.";
 
                 ctx.events.endTurn();
                 return;
@@ -166,6 +205,7 @@ function movePlayer(G, ctx, moveCount, moveDirection) {
 
     // Handle special tile events
     if (tileNumber in TILE_EVENT_MAP) {
-        TILE_EVENT_MAP[tileNumber](G, ctx);
+        TILE_EVENT_MAP[tileNumber].event(G, ctx);
+        G.infoText = TILE_EVENT_MAP[tileNumber].text;
     }
 }

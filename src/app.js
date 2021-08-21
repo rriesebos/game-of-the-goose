@@ -1,10 +1,12 @@
 import { Client } from 'boardgame.io/client';
 import { Local, SocketIO } from 'boardgame.io/multiplayer'
-import { GooseGame } from './game';
+import { GooseGame, TILE_EVENT_MAP } from './game';
 
 import { LobbyClient } from 'boardgame.io/client';
 
 import rollADie from './roll-a-die/roll-a-die';
+import ConfettiGenerator from 'confetti-js';
+
 import player0Img from '../img/player0.svg';
 import player1Img from '../img/player1.svg';
 import player2Img from '../img/player2.svg';
@@ -26,7 +28,7 @@ class GoosGameClient {
         this.client = Client({
             game: GooseGame,
             // TODO: make dynamic
-            numPlayers: 2,
+            numPlayers: 1,
 
             // multiplayer: SocketIO({ server: 'localhost:8000' }),
             multiplayer: Local(),
@@ -41,8 +43,11 @@ class GoosGameClient {
 
         this.rootElement = rootElement;
 
-        this.rollButton = this.rootElement.querySelector("#roll-button");
+        this.infoContainer = this.rootElement.querySelector('#info-container');
+        this.rollButton = this.rootElement.querySelector('#roll-button');
         this.spaceElement = this.rootElement.querySelector('#space');
+
+        this.confetti = new ConfettiGenerator({ target: 'confetti-canvas', max: 80, size: 1.6 });
 
         this.attachListeners();
         this.client.subscribe(state => this.update(state));
@@ -51,6 +56,7 @@ class GoosGameClient {
     attachListeners() {
         this.rollButton.onclick = () => {
             this.rollButton.disabled = true;
+            this.hideInfoText();
 
             this.client.moves.rollDice();
         }
@@ -92,71 +98,94 @@ class GoosGameClient {
         for (const [id, player] of Object.entries(state.G.players)) {
             // Draw players that are stationary
             if (state.G.players[id].moveList.length === 0) {
-                drawPlayerPosition(this.rootElement, i, player.tileNumber, id);
+                this.drawPlayerPosition(i, player.tileNumber, id);
             }
 
             i += spacing;
         }
 
         let previousPlayer = state.ctx.playOrderPos - 1 < 0 ? state.ctx.numPlayers - 1 : state.ctx.playOrderPos - 1;
-        let id = state.ctx.playOrder[previousPlayer];
-
-        if (state.ctx.gameover) {
-            id = state.ctx.currentPlayer;
-            this.rollButton.disabled = true;
-
-            // TODO: show winner (state.ctx.gameover.winner)
-        }
+        let id = state.ctx.gameover ? state.ctx.currentPlayer : state.ctx.playOrder[previousPlayer];
 
         // Animate moving player, scale animation time by number of moves
         let moveList = state.G.players[id].moveList;
+
+        if (state.ctx.turn > 1 && moveList.length === 0) {
+            this.showInfoText(state.G.infoText, 2000);
+        }
+
         for (let [from, to] of moveList) {
             let duration = Math.round(Math.min(500, 1000 / Math.abs(from - to)));
-            await animatePlayer(this.rootElement, state, id, from, to, duration);
+            await this.animatePlayer(state, id, from, to, duration);
+        }
+
+        if (state.ctx.gameover) {
+            this.rollButton.disabled = true;
+
+            this.confetti.render();
+
+            this.showInfoText(`Player ${state.ctx.gameover.winner} won!`);
         }
     }
-}
 
-// Returns a Promise that resolves after "ms" milliseconds
-const timer = ms => new Promise(res => setTimeout(res, ms));
+    // Returns a Promise that resolves after "ms" milliseconds
+    timer = ms => new Promise(res => setTimeout(res, ms));
 
-async function animatePlayer(rootElement, state, id, from, to, duration) {
-    let direction = 1;
-    if (from > to) {
-        direction = -1;
-    }
+    async animatePlayer(state, id, from, to, duration) {
+        let direction = 1;
+        if (from > to) {
+            direction = -1;
+        }
 
-    for (let i = from; i !== to + direction; i += direction) {
-        // Remove old player image
-        const oldTile = rootElement.querySelector(`[data-id='${i - direction}']`);
-        if (oldTile) {
-            let oldPlayerImg = rootElement.querySelector(`#player${id}`);
-            if (oldPlayerImg) {
-                oldPlayerImg.outerHTML = "";
+        for (let i = from; i !== to + direction; i += direction) {
+            // Remove old player image
+            const oldTile = this.rootElement.querySelector(`[data-id='${i - direction}']`);
+            if (oldTile) {
+                let oldPlayerImg = this.rootElement.querySelector(`#player${id}`);
+                if (oldPlayerImg) {
+                    oldPlayerImg.outerHTML = "";
+                }
             }
+
+            // Add new player image
+            let spacing = 11 / state.ctx.numPlayers;
+            let topSpacing = spacing / 2 + parseInt(id) * spacing;
+            this.drawPlayerPosition(topSpacing, i, id);
+
+            if (i in TILE_EVENT_MAP && i === to) {
+                await this.showInfoText(state.G.infoText, 5000);
+            }
+
+            // Wait between adding images
+            await this.timer(duration);
         }
-
-        // Add new player image
-        let spacing = 11 / state.ctx.numPlayers;
-        let topSpacing = spacing / 2 + parseInt(id) * spacing;
-        drawPlayerPosition(rootElement, topSpacing, i, id);
-
-        // Wait between adding images
-        await timer(duration);
     }
-}
 
-function drawPlayerPosition(rootElement, topSpacing, tile, id) {
-    const newTile = rootElement.querySelector(`[data-id='${tile}']`);
-    const playerGoose = document.createElement('img');
+    drawPlayerPosition(topSpacing, tile, id) {
+        const newTile = this.rootElement.querySelector(`[data-id='${tile}']`);
+        const playerGoose = document.createElement('img');
 
-    playerGoose.id = "player" + id;
-    playerGoose.classList.add("player");
-    playerGoose.src = PLAYER_IMAGE_MAP[id];
+        playerGoose.id = "player" + id;
+        playerGoose.classList.add("player");
+        playerGoose.src = PLAYER_IMAGE_MAP[id];
 
-    playerGoose.style.top = `${topSpacing}vh`;
+        playerGoose.style.top = `${topSpacing}vh`;
 
-    newTile.appendChild(playerGoose);
+        newTile.appendChild(playerGoose);
+    }
+
+    async showInfoText(text, duration) {
+        this.infoContainer.innerText = text;
+        this.infoContainer.style.opacity = 1;
+
+        await this.timer(duration);
+
+        this.hideInfoText();
+    }
+
+    hideInfoText() {
+        this.infoContainer.style.opacity = 0;
+    }
 }
 
 
