@@ -167,6 +167,10 @@ class GoosGameClient {
 
     drawPlayerPosition(topSpacing, tile, id) {
         const newTile = this.rootElement.querySelector(`[data-id='${tile}']`);
+        if (newTile.querySelector('#player' + id)) {
+            return;
+        }
+
         const playerGoose = document.createElement('img');
 
         playerGoose.id = "player" + id;
