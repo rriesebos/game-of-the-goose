@@ -65,7 +65,7 @@ body {
     color: white;
     text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
     text-align: center;
-    transition: border-color 0.2s, background-color 0.1s, color 0.1s;
+    transition: background-color 0.2s, color 0.2s;
     box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
     cursor: pointer;
 }
