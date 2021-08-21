@@ -110,8 +110,9 @@ class GoosGameClient {
         // Animate moving player, scale animation time by number of moves
         let moveList = state.G.players[id].moveList;
 
+        // Stuck on tile, show info text
         if (state.ctx.turn > 1 && moveList.length === 0) {
-            this.showInfoText(state.G.infoText, 2000);
+            this.showInfoText(state.G.infoText, 3000);
         }
 
         for (let [from, to] of moveList) {
@@ -124,12 +125,12 @@ class GoosGameClient {
 
             this.confetti.render();
 
-            this.showInfoText(`Player ${state.ctx.gameover.winner} won!`);
+            this.showInfoText(`Player ${state.ctx.gameover.winner} won!`, -1);
         }
     }
 
     // Returns a Promise that resolves after "ms" milliseconds
-    timer = ms => new Promise(res => setTimeout(res, ms));
+    timer = (ms) => new Promise(res => setTimeout(res, ms));
 
     async animatePlayer(state, id, from, to, duration) {
         let direction = 1;
@@ -141,9 +142,11 @@ class GoosGameClient {
             // Remove old player image
             const oldTile = this.rootElement.querySelector(`[data-id='${i - direction}']`);
             if (oldTile) {
-                let oldPlayerImg = this.rootElement.querySelector(`#player${id}`);
-                if (oldPlayerImg) {
-                    oldPlayerImg.outerHTML = "";
+                let oldPlayerImgs = this.rootElement.querySelectorAll(`#player${id}`);
+                if (oldPlayerImgs) {
+                    for (let oldPlayerImg of oldPlayerImgs) {
+                        oldPlayerImg.outerHTML = "";
+                    }
                 }
             }
 
@@ -152,7 +155,8 @@ class GoosGameClient {
             let topSpacing = spacing / 2 + parseInt(id) * spacing;
             this.drawPlayerPosition(topSpacing, i, id);
 
-            if (i in TILE_EVENT_MAP && i === to) {
+            if (i in TILE_EVENT_MAP && TILE_EVENT_MAP[i].condition(state.G, state.ctx) &&
+                i === to && state.G.infoText) {
                 await this.showInfoText(state.G.infoText, 5000);
             }
 
@@ -178,9 +182,10 @@ class GoosGameClient {
         this.infoContainer.innerText = text;
         this.infoContainer.style.opacity = 1;
 
-        await this.timer(duration);
-
-        this.hideInfoText();
+        if (duration >= 0) {
+            await this.timer(duration);
+            this.hideInfoText();
+        }
     }
 
     hideInfoText() {
