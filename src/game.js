@@ -21,15 +21,22 @@ const TILE_EVENT_MAP = {
         }
 
         if (nextPlayerTileNumber > 0) {
+            G.players[ctx.currentPlayer].moveList.push([tileNumber, nextPlayerTileNumber + 1]);
             G.players[ctx.currentPlayer].tileNumber = nextPlayerTileNumber + 1;
         }
     },
 
     // Move ahead to tile 12
-    6: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 12,
+    6: (G, ctx) => {
+        G.players[ctx.currentPlayer].moveList.push([6, 12]);
+        G.players[ctx.currentPlayer].tileNumber = 12;
+    },
 
     // Move back to tile 9
-    15: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 9,
+    15: (G, ctx) => {
+        G.players[ctx.currentPlayer].moveList.push([15, 9]);
+        G.players[ctx.currentPlayer].tileNumber = 9;
+    },
 
     // Skip the next turn
     19: (G, ctx) => G.players[ctx.currentPlayer].skipTurns = 1,
@@ -45,16 +52,25 @@ const TILE_EVENT_MAP = {
     31: (G, ctx) => G.players[ctx.currentPlayer].stuckInWell = true,
 
     // Move back to tile 33
-    39: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 33,
+    39: (G, ctx) => {
+        G.players[ctx.currentPlayer].moveList.push([39, 33]);
+        G.players[ctx.currentPlayer].tileNumber = 33;
+    },
 
     // Move back to tile 30
-    42: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 30,
+    42: (G, ctx) => {
+        G.players[ctx.currentPlayer].moveList.push([42, 30]);
+        G.players[ctx.currentPlayer].tileNumber = 30;
+    },
 
     // Skip the next 2 turns
     52: (G, ctx) => G.players[ctx.currentPlayer].skipTurns = 2,
 
     // Move back to tile 0 (the starting tile)
-    58: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 0,
+    58: (G, ctx) => {
+        G.players[ctx.currentPlayer].moveList.push([58, 0]);
+        G.players[ctx.currentPlayer].tileNumber = 0;
+    },
 };
 
 export const GooseGame = {
@@ -66,6 +82,7 @@ export const GooseGame = {
             players[i.toString()] = {
                 name: "Player " + i,
                 tileNumber: 0,
+                moveList: [],
                 skipTurns: 0,
                 stuckInWell: false,
             };
@@ -73,12 +90,18 @@ export const GooseGame = {
 
         return {
             die: null,
+            rollDice: false,
             players: players,
         }
     },
 
     moves: {
-        rollDice: (G, ctx, value) => {
+        rollDice: (G, ctx) => {
+            // Clear move lists
+            for (const player of Object.values(G.players)) {
+                player.moveList = [];
+            }
+
             // Check if the player has to skip a turn
             if (G.players[ctx.currentPlayer].skipTurns > 0) {
                 G.players[ctx.currentPlayer].skipTurns--;
@@ -87,16 +110,15 @@ export const GooseGame = {
                 return;
             }
 
-            // Roll a six-faced die
-            if (value) {
-                G.die = value;
-            } else {
-                G.die = ctx.random.D6();
-            }
-
+            G.die = ctx.random.D6();
             ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.die}`);
 
-            // Check if the player is stuck in the well, free player if they throw a 6
+            G.rollDice = true;
+        },
+        updatePlayer: (G, ctx) => {
+            G.rollDice = false;
+
+            // Check if the player is stuck in the well, free player if they threw a 6
             if (G.players[ctx.currentPlayer].stuckInWell) {
                 if (G.die !== 6) {
                     ctx.events.endTurn();
@@ -122,6 +144,7 @@ export const GooseGame = {
 
 function movePlayer(G, ctx, moveCount, moveDirection) {
     let tileNumber = G.players[ctx.currentPlayer].tileNumber;
+    let lastTileNumber = tileNumber;
     let nextMoveDirection = moveDirection;
 
     // Start moving backwards if the the max move count is exceeded
@@ -134,6 +157,7 @@ function movePlayer(G, ctx, moveCount, moveDirection) {
 
     // Move player to new tile (updating state)
     G.players[ctx.currentPlayer].tileNumber = tileNumber;
+    G.players[ctx.currentPlayer].moveList.push([lastTileNumber, tileNumber]);
 
     // Move again using the last throw
     if (MOVE_AGAIN_TILES.includes(tileNumber)) {

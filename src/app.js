@@ -52,25 +52,36 @@ class GoosGameClient {
         this.rollButton.onclick = () => {
             this.rollButton.disabled = true;
 
-            rollADie({
-                element: this.spaceElement,
-                numberOfDice: 1,
-                callback: (value) => {
-                    this.client.moves.rollDice(value);
-                },
-            });
+            this.client.moves.rollDice();
         }
     }
 
-    update(state) {
+    async update(state) {
         if (state === null) {
             return;
         }
 
+        // Play roll animation when needed
+        if (state.G.rollDice) {
+            rollADie({
+                element: this.spaceElement,
+                numberOfDice: 1,
+                callback: () => {
+                    // Update player when animation is finished
+                    this.client.moves.updatePlayer();
+                },
+                values: [state.G.die]
+            });
+
+            return;
+        }
+
+        // Enable roll button for current player
         if (state.ctx.currentPlayer === this.client.playerID) {
             this.rollButton.disabled = false;
         }
 
+        // Clear all tiles
         const tiles = this.rootElement.querySelectorAll('.tile');
         tiles.forEach(tile => {
             tile.innerHTML = tile.dataset.id;
@@ -79,19 +90,75 @@ class GoosGameClient {
         const spacing = 11 / state.ctx.numPlayers;
         let i = spacing / 2;
         for (const [id, player] of Object.entries(state.G.players)) {
-            const newTile = this.rootElement.querySelector(`[data-id='${player.tileNumber}']`);
-            const playerGoose = document.createElement('img');
+            // Draw players that are stationary
+            if (state.G.players[id].moveList.length === 0) {
+                drawPlayerPosition(this.rootElement, i, player.tileNumber, id);
+            }
 
-            playerGoose.id = "player" + id;
-            playerGoose.classList.add("player");
-            playerGoose.src = PLAYER_IMAGE_MAP[id];
-            playerGoose.style.top = `${i}vh`;
-
-            newTile.appendChild(playerGoose);
             i += spacing;
+        }
+
+        let previousPlayer = state.ctx.playOrderPos - 1 < 0 ? state.ctx.numPlayers - 1 : state.ctx.playOrderPos - 1;
+        let id = state.ctx.playOrder[previousPlayer];
+
+        if (state.ctx.gameover) {
+            id = state.ctx.currentPlayer;
+            this.rollButton.disabled = true;
+
+            // TODO: show winner (state.ctx.gameover.winner)
+        }
+
+        // Animate moving player, scale animation time by number of moves
+        let moveList = state.G.players[id].moveList;
+        for (let [from, to] of moveList) {
+            let duration = Math.round(Math.min(500, 1000 / Math.abs(from - to)));
+            await animatePlayer(this.rootElement, state, id, from, to, duration);
         }
     }
 }
+
+// Returns a Promise that resolves after "ms" milliseconds
+const timer = ms => new Promise(res => setTimeout(res, ms));
+
+async function animatePlayer(rootElement, state, id, from, to, duration) {
+    let direction = 1;
+    if (from > to) {
+        direction = -1;
+    }
+
+    for (let i = from; i !== to + direction; i += direction) {
+        // Remove old player image
+        const oldTile = rootElement.querySelector(`[data-id='${i - direction}']`);
+        if (oldTile) {
+            let oldPlayerImg = rootElement.querySelector(`#player${id}`);
+            if (oldPlayerImg) {
+                oldPlayerImg.outerHTML = "";
+            }
+        }
+
+        // Add new player image
+        let spacing = 11 / state.ctx.numPlayers;
+        let topSpacing = spacing / 2 + parseInt(id) * spacing;
+        drawPlayerPosition(rootElement, topSpacing, i, id);
+
+        // Wait between adding images
+        await timer(duration);
+    }
+}
+
+function drawPlayerPosition(rootElement, topSpacing, tile, id) {
+    const newTile = rootElement.querySelector(`[data-id='${tile}']`);
+    const playerGoose = document.createElement('img');
+
+    playerGoose.id = "player" + id;
+    playerGoose.classList.add("player");
+    playerGoose.src = PLAYER_IMAGE_MAP[id];
+
+    playerGoose.style.top = `${topSpacing}vh`;
+
+    newTile.appendChild(playerGoose);
+}
+
 
 const appElement = document.querySelector('.app-container');
 new GoosGameClient(appElement, { matchID: '', playerID: '0', credentials: '' });
