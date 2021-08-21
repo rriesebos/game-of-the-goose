@@ -63,7 +63,6 @@ export const TILE_EVENT_MAP = {
     26: {
         condition: (G, ctx) => G.die === 1 || G.die === 2,
         event: (G, ctx) => {
-            G.players[ctx.currentPlayer].moveList = [];
             ctx.events.endTurn({ next: ctx.currentPlayer });
         },
         text: `Dice: You threw 1 or 2, throw again!`
@@ -158,7 +157,7 @@ export const GooseGame = {
                 return;
             }
 
-            G.die = ctx.random.D6();
+                G.die = ctx.random.D6();
             ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.die}`);
 
             G.rollDice = true;
