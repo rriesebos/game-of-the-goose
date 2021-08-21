@@ -5,6 +5,7 @@ export const MOVE_AGAIN_TILES = [1, 5, 10, 23, 32, 41, 45, 54, 59];
 export const TILE_EVENT_MAP = {
     // Move player in front of the next player
     3: {
+        condition: (G, ctx) => Object.values(G.players).some((player) => player.tileNumber > G.players[ctx.currentPlayer].tileNumber),
         event: (G, ctx) => {
             let tileNumber = G.players[ctx.currentPlayer].tileNumber;
 
@@ -22,8 +23,8 @@ export const TILE_EVENT_MAP = {
             }
 
             if (nextPlayerTileNumber > 0) {
-                G.players[ctx.currentPlayer].moveList.push([tileNumber, nextPlayerTileNumber + 1]);
                 G.players[ctx.currentPlayer].tileNumber = nextPlayerTileNumber + 1;
+                G.players[ctx.currentPlayer].moveList.push([tileNumber, nextPlayerTileNumber + 1]);
             }
         },
         text: `Leapfrog: Move in front of the next player!`
@@ -31,6 +32,7 @@ export const TILE_EVENT_MAP = {
 
     // Move ahead to tile 12
     6: {
+        condition: (G, ctx) => true,
         event: (G, ctx) => {
             G.players[ctx.currentPlayer].moveList.push([6, 12]);
             G.players[ctx.currentPlayer].tileNumber = 12;
@@ -40,6 +42,7 @@ export const TILE_EVENT_MAP = {
 
     // Move back to tile 9
     15: {
+        condition: (G, ctx) => true,
         event: (G, ctx) => {
             G.players[ctx.currentPlayer].moveList.push([15, 9]);
             G.players[ctx.currentPlayer].tileNumber = 9;
@@ -49,6 +52,7 @@ export const TILE_EVENT_MAP = {
 
     // Skip the next turn
     19: {
+        condition: (G, ctx) => true,
         event: (G, ctx) => {
             G.players[ctx.currentPlayer].skipTurns = 1;
         },
@@ -57,16 +61,17 @@ export const TILE_EVENT_MAP = {
 
     // Throw again if the last throw was either 1 or 2
     26: {
+        condition: (G, ctx) => G.die === 1 || G.die === 2,
         event: (G, ctx) => {
-            if (G.die === 1 || G.die === 2) {
-                ctx.events.endTurn({ next: ctx.currentPlayer });
-            }
+            G.players[ctx.currentPlayer].moveList = [];
+            ctx.events.endTurn({ next: ctx.currentPlayer });
         },
         text: `Dice: You threw 1 or 2, throw again!`
     },
 
     // Player falls in the well
     31: {
+        condition: (G, ctx) => true,
         event: (G, ctx) => {
             G.players[ctx.currentPlayer].stuckInWell = true;
         },
@@ -75,6 +80,7 @@ export const TILE_EVENT_MAP = {
 
     // Move back to tile 33
     39: {
+        condition: (G, ctx) => true,
         event: (G, ctx) => {
             G.players[ctx.currentPlayer].moveList.push([39, 33]);
             G.players[ctx.currentPlayer].tileNumber = 33;
@@ -84,6 +90,7 @@ export const TILE_EVENT_MAP = {
 
     // Move back to tile 30
     42: {
+        condition: (G, ctx) => true,
         event: (G, ctx) => {
             G.players[ctx.currentPlayer].moveList.push([42, 30]);
             G.players[ctx.currentPlayer].tileNumber = 30;
@@ -93,6 +100,7 @@ export const TILE_EVENT_MAP = {
 
     // Skip the next 2 turns
     52: {
+        condition: (G, ctx) => true,
         event: (G, ctx) => {
             G.players[ctx.currentPlayer].skipTurns = 2;
         },
@@ -101,6 +109,7 @@ export const TILE_EVENT_MAP = {
 
     // Move back to tile 0 (the starting tile)
     58: {
+        condition: (G, ctx) => true,
         event: (G, ctx) => {
             G.players[ctx.currentPlayer].moveList.push([58, 0]);
             G.players[ctx.currentPlayer].tileNumber = 0;
@@ -190,6 +199,9 @@ function movePlayer(G, ctx, moveCount, moveDirection) {
     if (tileNumber + moveCount * moveDirection > MAX_MOVE_COUNT) {
         nextMoveDirection = -1;
         tileNumber = 2 * MAX_MOVE_COUNT - tileNumber - moveCount;
+
+        G.players[ctx.currentPlayer].moveList.push([lastTileNumber, MAX_MOVE_COUNT]);
+        lastTileNumber = MAX_MOVE_COUNT;
     } else {
         tileNumber += moveCount * moveDirection;
     }
@@ -204,7 +216,7 @@ function movePlayer(G, ctx, moveCount, moveDirection) {
     }
 
     // Handle special tile events
-    if (tileNumber in TILE_EVENT_MAP) {
+    if (tileNumber in TILE_EVENT_MAP && TILE_EVENT_MAP[tileNumber].condition(G, ctx)) {
         TILE_EVENT_MAP[tileNumber].event(G, ctx);
         G.infoText = TILE_EVENT_MAP[tileNumber].text;
     }
