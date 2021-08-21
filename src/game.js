@@ -157,7 +157,7 @@ export const GooseGame = {
                 return;
             }
 
-                G.die = ctx.random.D6();
+            G.die = ctx.random.D6();
             ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.die}`);
 
             G.rollDice = true;
