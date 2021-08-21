@@ -82,11 +82,6 @@ class GoosGameClient {
             return;
         }
 
-        // Enable roll button for current player
-        if (state.ctx.currentPlayer === this.client.playerID) {
-            this.rollButton.disabled = false;
-        }
-
         // Clear all tiles
         const tiles = this.rootElement.querySelectorAll('.tile');
         tiles.forEach(tile => {
@@ -107,7 +102,6 @@ class GoosGameClient {
         let previousPlayer = state.ctx.playOrderPos - 1 < 0 ? state.ctx.numPlayers - 1 : state.ctx.playOrderPos - 1;
         let id = state.ctx.gameover ? state.ctx.currentPlayer : state.ctx.playOrder[previousPlayer];
 
-        // Animate moving player, scale animation time by number of moves
         let moveList = state.G.players[id].moveList;
 
         // Stuck on tile, show info text
@@ -115,9 +109,15 @@ class GoosGameClient {
             this.showInfoText(state.G.infoText, 3000);
         }
 
+        // Animate moving player, scale animation time by number of moves
         for (let [from, to] of moveList) {
             let duration = Math.round(Math.min(500, 1000 / Math.abs(from - to)));
             await this.animatePlayer(state, id, from, to, duration);
+        }
+
+        // Enable roll button for current player
+        if (state.ctx.currentPlayer === this.client.playerID) {
+            this.rollButton.disabled = false;
         }
 
         if (state.ctx.gameover) {
