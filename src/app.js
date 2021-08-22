@@ -133,20 +133,15 @@ class GoosGameClient {
     timer = (ms) => new Promise(res => setTimeout(res, ms));
 
     async animatePlayer(state, id, from, to, duration) {
-        let direction = 1;
-        if (from > to) {
-            direction = -1;
-        }
+        let direction = from > to ? -1 : 1;
 
         for (let i = from; i !== to + direction; i += direction) {
             // Remove old player image
             const oldTile = this.rootElement.querySelector(`[data-id='${i - direction}']`);
             if (oldTile) {
                 let oldPlayerImgs = this.rootElement.querySelectorAll(`#player${id}`);
-                if (oldPlayerImgs) {
-                    for (let oldPlayerImg of oldPlayerImgs) {
-                        oldPlayerImg.outerHTML = "";
-                    }
+                for (let oldPlayerImg of oldPlayerImgs) {
+                    oldPlayerImg.outerHTML = "";
                 }
             }
 
