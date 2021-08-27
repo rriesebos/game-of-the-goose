@@ -133,12 +133,12 @@ const rollADie = function(options) {
         ]
         .map(getFace)
             .forEach((face) => dice.appendChild(face));
-
-        let diceOuter = document.querySelector('.dice-outer');
-        diceOuter.addEventListener("animationend", function() {
-            callback(result);
-        }, false);
     }
+
+    let diceOuter = document.querySelector('.dice-outer');
+    diceOuter.addEventListener("animationend", function() {
+        callback(result);
+    }, false);
 };
 
 export default rollADie;
