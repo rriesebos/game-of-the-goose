@@ -111,6 +111,10 @@ body {
     transform: perspective(2000px) rotateX(-20deg) translateY(-25%);
 }
 
+.dice-outer {
+    margin-left: 2em;
+}
+
 .tile {
     height: 100%;
     display: flex;
