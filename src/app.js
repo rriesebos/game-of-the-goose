@@ -1,6 +1,7 @@
 import { Client } from 'boardgame.io/client';
 import { Local, SocketIO } from 'boardgame.io/multiplayer'
-import { GooseGame, TILE_EVENT_MAP } from './game';
+import { createGame } from './game';
+import { rulesets } from './rulesets';
 
 import { LobbyClient } from 'boardgame.io/client';
 
@@ -26,7 +27,8 @@ const PLAYER_IMAGE_MAP = {
 class GoosGameClient {
     constructor(rootElement, { matchID, playerID, credentials }) {
         this.client = Client({
-            game: GooseGame,
+            // TODO: make ruleset dynamic
+            game: createGame('modern'),
             // TODO: make dynamic
             numPlayers: 1,
 
@@ -71,12 +73,12 @@ class GoosGameClient {
         if (state.G.rollDice) {
             rollADie({
                 element: this.spaceElement,
-                numberOfDice: 1,
+                numberOfDice: rulesets[state.G.ruleset].DICE_COUNT,
                 callback: () => {
                     // Update player when animation is finished
                     this.client.moves.updatePlayer();
                 },
-                values: [state.G.die]
+                values: state.G.dice
             });
 
             return;
@@ -123,9 +125,12 @@ class GoosGameClient {
         if (state.ctx.gameover) {
             this.rollButton.disabled = true;
 
-            this.confetti.render();
-
-            this.showInfoText(`Player ${state.ctx.gameover.winner} won!`, -1);
+            if (state.ctx.gameover.winner) {
+                this.confetti.render();
+                this.showInfoText(`Player ${state.ctx.gameover.winner} won!`, -1);
+            } else {
+                this.showInfoText('All players are stuck! The game ends in a draw.', -1);
+            }
         }
     }
 
@@ -150,6 +155,7 @@ class GoosGameClient {
             let topSpacing = spacing / 2 + parseInt(id) * spacing;
             this.drawPlayerPosition(topSpacing, i, id);
 
+            const TILE_EVENT_MAP = rulesets[state.G.ruleset].TILE_EVENT_MAP;
             if (i in TILE_EVENT_MAP && TILE_EVENT_MAP[i].condition(state.G, state.ctx) &&
                 i === to && state.G.infoText) {
                 await this.showInfoText(state.G.infoText, 5000);
