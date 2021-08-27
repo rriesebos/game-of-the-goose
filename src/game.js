@@ -1,6 +1,6 @@
 const MAX_MOVE_COUNT = 63;
 
-export const MOVE_AGAIN_TILES = [1, 5, 10, 23, 32, 41, 45, 54, 59];
+const MOVE_AGAIN_TILES = [1, 5, 10, 23, 32, 41, 45, 54, 59];
 
 export const TILE_EVENT_MAP = {
     // Move player in front of the next player
@@ -37,7 +37,7 @@ export const TILE_EVENT_MAP = {
             G.players[ctx.currentPlayer].moveList.push([6, 12]);
             G.players[ctx.currentPlayer].tileNumber = 12;
         },
-        text: `Bridge: You can cross the river, continue to tile 12!`
+        text: `Bridge: You can cross the river, continue to 12!`
     },
 
     // Move back to tile 9
@@ -47,7 +47,7 @@ export const TILE_EVENT_MAP = {
             G.players[ctx.currentPlayer].moveList.push([15, 9]);
             G.players[ctx.currentPlayer].tileNumber = 9;
         },
-        text: `Birdcage: A bird has escaped! To catch it, move back to tile 9.`
+        text: `Birdcage: A bird has escaped! To catch it, move back to 9.`
     },
 
     // Skip the next turn
@@ -84,7 +84,7 @@ export const TILE_EVENT_MAP = {
             G.players[ctx.currentPlayer].moveList.push([39, 33]);
             G.players[ctx.currentPlayer].tileNumber = 33;
         },
-        text: `Stairs: Dummy! You fell off the stairs, go back to tile 33.`
+        text: `Stairs: Dummy! You fell off the stairs, go back to 33.`
     },
 
     // Move back to tile 30
@@ -94,7 +94,7 @@ export const TILE_EVENT_MAP = {
             G.players[ctx.currentPlayer].moveList.push([42, 30]);
             G.players[ctx.currentPlayer].tileNumber = 30;
         },
-        text: `Maze: Now you also got lost in the maze! Go back to tile 30.`
+        text: `Maze: You've got lost in the maze! Go back to 30.`
     },
 
     // Skip the next 2 turns
@@ -113,7 +113,7 @@ export const TILE_EVENT_MAP = {
             G.players[ctx.currentPlayer].moveList.push([58, 0]);
             G.players[ctx.currentPlayer].tileNumber = 0;
         },
-        text: `Graveyard: Your life has come to an end, but you get a second chance. Start again on tile 0.`
+        text: `Graveyard: Your life has come to an end, but you get a second chance. Move back to start...`
     },
 };
 
