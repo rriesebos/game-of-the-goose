@@ -129,7 +129,7 @@ body {
     transform-style: preserve-3d;
 }
 
-.player {
+.goose {
     position: absolute;
     width: 100%;
     min-width: 30px;

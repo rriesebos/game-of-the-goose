@@ -1,6 +1,6 @@
 import { Client } from 'boardgame.io/client';
 import { Local, SocketIO } from 'boardgame.io/multiplayer'
-import { createGame } from './game';
+import { GooseGame } from './game';
 import { rulesets } from './rulesets';
 
 import { LobbyClient } from 'boardgame.io/client';
@@ -27,8 +27,8 @@ const PLAYER_IMAGE_MAP = {
 class GoosGameClient {
     constructor(rootElement, { matchID, playerID, credentials }) {
         this.client = Client({
-            // TODO: make ruleset dynamic
-            game: createGame('modern'),
+            game: GooseGame,
+
             // TODO: make dynamic
             numPlayers: 1,
 
@@ -175,7 +175,7 @@ class GoosGameClient {
         const playerGoose = document.createElement('img');
 
         playerGoose.id = "player" + id;
-        playerGoose.classList.add("player");
+        playerGoose.classList.add("goose");
         playerGoose.src = PLAYER_IMAGE_MAP[id];
 
         playerGoose.style.top = `${topSpacing}vh`;
