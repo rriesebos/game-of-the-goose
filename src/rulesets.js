@@ -11,7 +11,7 @@ export const rulesets = {
                     let tileNumber = G.players[ctx.currentPlayer].tileNumber;
 
                     let nextPlayerTileNumber = 0;
-                    let distanceToNextPlayer = MAX_MOVE_COUNT;
+                    let distanceToNextPlayer = 63;
                     for (const player of Object.values(G.players)) {
                         if (player.id === ctx.currentPlayer || player.tileNumber === 0) {
                             continue;
