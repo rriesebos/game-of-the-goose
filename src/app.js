@@ -232,7 +232,7 @@ class GoosGameClient {
 
             if (ctx.gameover.winner) {
                 this.confetti.render();
-                this.showInfoText(`Player ${ctx.gameover.winner} won!`, -1);
+                this.showInfoText(`${ctx.gameover.winner} won!`, -1);
             } else {
                 this.showInfoText('All players are stuck! The game ends in a draw.', -1);
             }

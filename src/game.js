@@ -84,7 +84,7 @@ export const GooseGame = {
 
         // End the game if a player reaches the last tile
         if (G.players[ctx.currentPlayer].tileNumber === MAX_MOVE_COUNT) {
-            return { winner: ctx.currentPlayer };
+            return { winner: G.players[ctx.currentPlayer].name };
         }
 
         // End if all players are stuck, resulting in a draw
