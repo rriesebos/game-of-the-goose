@@ -1,139 +1,132 @@
-const MAX_MOVE_COUNT = 63;
-
-const MOVE_AGAIN_TILES = [1, 5, 10, 23, 32, 41, 45, 54, 59];
-
-const TILE_EVENT_MAP = {
-    // Move player in front of the next player
-    3: (G, ctx) => {
-        let tileNumber = G.players[ctx.currentPlayer].tileNumber;
-
-        let nextPlayerTileNumber = 0, distanceToNextPlayer = MAX_MOVE_COUNT;
-        for (const player of Object.values(G.players)) {
-            if (player.id === ctx.currentPlayer || player.tileNumber === 0) {
-                continue;
-            }
-
-            if (player.tileNumber > tileNumber && player.tileNumber - tileNumber < distanceToNextPlayer) {
-                distanceToNextPlayer = player.tileNumber - tileNumber;
-                nextPlayerTileNumber = player.tileNumber;
-            }
-        }
-
-        if (nextPlayerTileNumber > 0) {
-            G.players[ctx.currentPlayer].tileNumber = nextPlayerTileNumber + 1;
-        }
-    },
-
-    // Move ahead to tile 12
-    6: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 12,
-
-    // Move back to tile 9
-    15: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 9,
-
-    // Skip the next turn
-    19: (G, ctx) => G.players[ctx.currentPlayer].skipTurns = 1,
-
-    // Throw again if the last throw was either 1 or 2
-    26: (G, ctx) => {
-        if (G.die === 1 || G.die === 2) {
-            ctx.events.endTurn({ next: ctx.currentPlayer });
-        }
-    },
-
-    // Player falls in the well
-    31: (G, ctx) => G.players[ctx.currentPlayer].stuckInWell = true,
-
-    // Move back to tile 33
-    39: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 33,
-
-    // Move back to tile 30
-    42: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 30,
-
-    // Skip the next 2 turns
-    52: (G, ctx) => G.players[ctx.currentPlayer].skipTurns = 2,
-
-    // Move back to tile 0 (the starting tile)
-    58: (G, ctx) => G.players[ctx.currentPlayer].tileNumber = 0,
-};
+import { rulesets } from "./rulesets";
 
 export const GooseGame = {
-    setup: (ctx) => {
+    name: 'game-of-the-goose',
+
+    setup: (ctx, setupData) => {
+        // TODO: remove when no longer needed
+        if (!setupData) {
+            setupData = { ruleset: 'modern' };
+        }
+
         let players = {};
         for (let i = 0; i < ctx.numPlayers; i++) {
             players[i.toString()] = {
-                name: "Player " + i,
+                id: i.toString(),
+                name: 'Player ' + i,
                 tileNumber: 0,
+                moveList: [],
                 skipTurns: 0,
-                stuckInWell: false,
+                stuck: false,
             };
         }
 
         return {
-            die: null,
+            ruleset: setupData.ruleset,
+            dice: null,
+            rollDice: false,
             players: players,
+            infoText: '',
         }
     },
 
     moves: {
         rollDice: (G, ctx) => {
+            const DICE_COUNT = rulesets[G.ruleset].DICE_COUNT;
+            const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
+
+            // Clear move lists
+            for (const player of Object.values(G.players)) {
+                player.moveList = [];
+            }
+
             // Check if the player has to skip a turn
             if (G.players[ctx.currentPlayer].skipTurns > 0) {
                 G.players[ctx.currentPlayer].skipTurns--;
+
+                G.infoText = "Skipped turn.";
 
                 ctx.events.endTurn();
                 return;
             }
 
-            // Roll a six-faced die
-            G.die = ctx.random.D6();
-            ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.die}`);
+            G.dice = ctx.random.D6(DICE_COUNT);
+            ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.dice}`);
 
-            // Check if the player is stuck in the well, free player if they throw a 6
-            if (G.players[ctx.currentPlayer].stuckInWell) {
-                if (G.die !== 6) {
+            // Check if the player is stuck, free player if the escape condition is met
+            if (G.players[ctx.currentPlayer].stuck) {
+                if (!TILE_EVENT_MAP[G.players[ctx.currentPlayer].tileNumber].escapeCondition(G, ctx)) {
+
+                    G.infoText = "Skipped turn.";
+
                     ctx.events.endTurn();
                     return;
                 }
 
-                G.players[ctx.currentPlayer].stuckInWell = false;
+                G.players[ctx.currentPlayer].stuck = false;
             }
 
-            movePlayer(G, ctx, G.die, 1);
+            G.rollDice = true;
+        },
+        updatePlayer: (G, ctx) => {
+            G.rollDice = false;
+
+            const diceSum = G.dice.reduce((a, b) => a + b, 0);
+            movePlayer(G, ctx, diceSum, 1);
 
             ctx.events.endTurn();
         },
     },
 
     endIf: (G, ctx) => {
+        const MAX_MOVE_COUNT = rulesets[G.ruleset].MAX_MOVE_COUNT;
+        const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
+
         // End the game if a player reaches the last tile
         if (G.players[ctx.currentPlayer].tileNumber === MAX_MOVE_COUNT) {
-            return { winner: ctx.currentPlayer };
+            return { winner: G.players[ctx.currentPlayer].name };
+        }
+
+        // End if all players are stuck, resulting in a draw
+        if (Object.values(G.players).every((player) => player.stuck &&
+                TILE_EVENT_MAP[player.tileNumber].endGameIfAllStuck)) {
+            return { winner: null };
         }
     },
 };
 
 function movePlayer(G, ctx, moveCount, moveDirection) {
+    const MAX_MOVE_COUNT = rulesets[G.ruleset].MAX_MOVE_COUNT;
+    const MOVE_AGAIN_TILES = rulesets[G.ruleset].MOVE_AGAIN_TILES;
+    const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
+
     let tileNumber = G.players[ctx.currentPlayer].tileNumber;
+    let lastTileNumber = tileNumber;
     let nextMoveDirection = moveDirection;
 
     // Start moving backwards if the the max move count is exceeded
     if (tileNumber + moveCount * moveDirection > MAX_MOVE_COUNT) {
         nextMoveDirection = -1;
         tileNumber = 2 * MAX_MOVE_COUNT - tileNumber - moveCount;
+
+        G.players[ctx.currentPlayer].moveList.push([lastTileNumber, MAX_MOVE_COUNT]);
+        lastTileNumber = MAX_MOVE_COUNT;
     } else {
         tileNumber += moveCount * moveDirection;
     }
 
     // Move player to new tile (updating state)
     G.players[ctx.currentPlayer].tileNumber = tileNumber;
-
-    // Move again using the last throw
-    if (MOVE_AGAIN_TILES.includes(tileNumber)) {
-        movePlayer(G, ctx, moveCount, nextMoveDirection);
-    }
+    G.players[ctx.currentPlayer].moveList.push([lastTileNumber, tileNumber]);
 
     // Handle special tile events
-    if (tileNumber in TILE_EVENT_MAP) {
-        TILE_EVENT_MAP[tileNumber](G, ctx);
+    if (tileNumber in TILE_EVENT_MAP && TILE_EVENT_MAP[tileNumber].condition(G, ctx)) {
+        TILE_EVENT_MAP[tileNumber].event(G, ctx);
+        G.infoText = TILE_EVENT_MAP[tileNumber].text;
+    }
+
+    // Move again using the last throw
+    if (MOVE_AGAIN_TILES.includes(G.players[ctx.currentPlayer].tileNumber)) {
+        movePlayer(G, ctx, moveCount, nextMoveDirection);
     }
 }

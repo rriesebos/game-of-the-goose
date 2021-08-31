@@ -1,0 +1,211 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Quicksand', sans-serif;
+}
+
+:root {
+    --tile-curve: 50%;
+    --board-rotation: 55deg;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    place-content: center;
+    height: 100vh;
+    background: #b6efd48e;
+}
+
+#info-container {
+    opacity: 0;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 40rem;
+    top: 20rem;
+    padding: 1rem 2rem;
+    margin: 0 20%;
+    align-self: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 1rem;
+    border: 4px solid white;
+    font-weight: 500;
+    font-size: 2em;
+    color: white;
+    text-align: center;
+    text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
+    z-index: 300;
+    transition: opacity linear 0.2s;
+}
+
+#confetti-canvas {
+    position: absolute;
+    pointer-events: none;
+    height: 100%;
+    width: 100%;
+    z-index: 200;
+}
+
+#roll-button {
+    position: relative;
+    top: 5rem;
+    background-color: #f14e4e;
+    align-self: center;
+    display: inline-block;
+    padding: 0.3em 1.6em;
+    border: 0.2em solid rgba(255, 255, 255, 0);
+    border-radius: 0.6em;
+    font-size: 1.5em;
+    color: white;
+    text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
+    text-align: center;
+    transition: background-color 0.2s, color 0.2s;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+#roll-button:hover {
+    border-color: rgba(255, 255, 255, 1);
+}
+
+#roll-button:active {
+    top: 5.2rem;
+}
+
+#roll-button:disabled {
+    top: 5rem;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #666;
+    cursor: auto;
+}
+
+.board {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    row-gap: 10px;
+    column-gap: 8px;
+    padding: 20px;
+    margin: 0 15%;
+    background: #ffde82;
+    border: 12px solid #8E6E53;
+    border-radius: 2%;
+    transform-style: preserve-3d;
+    transform: perspective(2000px) rotateX(var(--board-rotation));
+    box-shadow: 4px 6px 4px 1px rgba(0, 0, 0, 0.2);
+}
+
+#space {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: max(2vw, 2vh);
+    grid-column: span 8;
+    transform: perspective(2000px) rotateX(-20deg) translateY(-25%);
+}
+
+.dice-outer {
+    margin-left: 2em;
+}
+
+.tile {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    background: #058C42;
+    color: white;
+    border: 1px solid black;
+    font-size: max(2vw, 2vh);
+    font-weight: bold;
+    transform-style: preserve-3d;
+}
+
+.goose {
+    position: absolute;
+    width: 100%;
+    min-width: 30px;
+    z-index: 100;
+    transform: perspective(2000px) rotateX(-75deg) translateY(-50%) translateX(5px);
+}
+
+.tile.special {
+    background: #E23742;
+}
+
+#tile0 {
+    border-radius: 10px 0 0 10px;
+}
+
+#tile63 {
+    border-radius: 0 10px 10px 0;
+}
+
+#tile11,
+#tile41 {
+    border-radius: 0 var(--tile-curve) 0 0;
+}
+
+#tile31,
+#tile55 {
+    border-radius: var(--tile-curve) 0 0 0;
+}
+
+#tile16,
+#tile44 {
+    border-radius: 0 0 var(--tile-curve) 0;
+}
+
+#tile27,
+#tile53 {
+    border-radius: 0 0 0 var(--tile-curve);
+}
+
+
+/* Rotate player image to the left */
+
+#tile11>.goose,
+#tile12>.goose,
+#tile13>.goose,
+#tile14>.goose,
+#tile15>.goose,
+#tile11>.goose,
+#tile12>.goose,
+#tile13>.goose,
+#tile14>.goose,
+#tile15>.goose,
+#tile16>.goose,
+#tile17>.goose,
+#tile18>.goose,
+#tile19>.goose,
+#tile20>.goose,
+#tile21>.goose,
+#tile22>.goose,
+#tile23>.goose,
+#tile24>.goose,
+#tile25>.goose,
+#tile26>.goose,
+#tile27>.goose,
+#tile41>.goose,
+#tile42>.goose,
+#tile43>.goose,
+#tile44>.goose,
+#tile45>.goose,
+#tile46>.goose,
+#tile47>.goose,
+#tile48>.goose,
+#tile49>.goose,
+#tile50>.goose,
+#tile51>.goose,
+#tile52>.goose,
+#tile53>.goose {
+    transform: scaleX(-1) perspective(2000px) rotateX(-70deg) translateY(-50%);
+}
