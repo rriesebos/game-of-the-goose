@@ -82,7 +82,8 @@ export const rulesets = {
                 escapeCondition: (G, ctx) => {
                     const diceSum = G.dice.reduce((a, b) => a + b, 0);
                     return diceSum === 6;
-                }
+                },
+                endGameIfAllStuck: false
             },
 
             // Move back to tile 33
@@ -179,7 +180,10 @@ export const rulesets = {
                     G.players[ctx.currentPlayer].stuck = true;
                 },
                 text: `The well: You fell into the well! You may only continue when another player frees you.`,
-                escapeCondition: (G, ctx) => Object.values(G.players).some((player) => player.tileNumber === G.players[ctx.currentPlayer].tileNumber)
+                escapeCondition: (G, ctx) => Object.values(G.players).some(
+                    (player) => player.id !== ctx.currentPlayer && player.tileNumber === G.players[ctx.currentPlayer].tileNumber
+                ),
+                endGameIfAllStuck: true
             },
 
             // Move back to tile 37
@@ -199,7 +203,10 @@ export const rulesets = {
                     G.players[ctx.currentPlayer].stuck = true;
                 },
                 text: `Prison: And now you're going to jail?! You may only continue when another player frees you.`,
-                escapeCondition: (G, ctx) => Object.values(G.players).some((player) => player.tileNumber === G.players[ctx.currentPlayer].tileNumber)
+                escapeCondition: (G, ctx) => Object.values(G.players).some(
+                    (player) => player.id !== ctx.currentPlayer && player.tileNumber === G.players[ctx.currentPlayer].tileNumber
+                ),
+                endGameIfAllStuck: true
             },
 
             // Move back to tile 0 (the starting tile)

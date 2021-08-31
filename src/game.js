@@ -12,6 +12,7 @@ export const GooseGame = {
         let players = {};
         for (let i = 0; i < ctx.numPlayers; i++) {
             players[i.toString()] = {
+                id: i.toString(),
                 name: 'Player ' + i,
                 tileNumber: 0,
                 moveList: [],
@@ -32,6 +33,7 @@ export const GooseGame = {
     moves: {
         rollDice: (G, ctx) => {
             const DICE_COUNT = rulesets[G.ruleset].DICE_COUNT;
+            const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
 
             // Clear move lists
             for (const player of Object.values(G.players)) {
@@ -51,22 +53,23 @@ export const GooseGame = {
             G.dice = ctx.random.D6(DICE_COUNT);
             ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.dice}`);
 
-            G.rollDice = true;
-        },
-        updatePlayer: (G, ctx) => {
-            const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
-
-            G.rollDice = false;
-
-            // Check if the player is stuck in the well, free player if they threw a 6
+            // Check if the player is stuck, free player if the escape condition is met
             if (G.players[ctx.currentPlayer].stuck) {
                 if (!TILE_EVENT_MAP[G.players[ctx.currentPlayer].tileNumber].escapeCondition(G, ctx)) {
+
+                    G.infoText = "Skipped turn.";
+
                     ctx.events.endTurn();
                     return;
                 }
 
                 G.players[ctx.currentPlayer].stuck = false;
             }
+
+            G.rollDice = true;
+        },
+        updatePlayer: (G, ctx) => {
+            G.rollDice = false;
 
             const diceSum = G.dice.reduce((a, b) => a + b, 0);
             movePlayer(G, ctx, diceSum, 1);
@@ -77,6 +80,7 @@ export const GooseGame = {
 
     endIf: (G, ctx) => {
         const MAX_MOVE_COUNT = rulesets[G.ruleset].MAX_MOVE_COUNT;
+        const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
 
         // End the game if a player reaches the last tile
         if (G.players[ctx.currentPlayer].tileNumber === MAX_MOVE_COUNT) {
@@ -84,7 +88,8 @@ export const GooseGame = {
         }
 
         // End if all players are stuck, resulting in a draw
-        if (Object.values(G.players).every((player) => player.stuck)) {
+        if (Object.values(G.players).every((player) => player.stuck &&
+                TILE_EVENT_MAP[player.tileNumber].endGameIfAllStuck)) {
             return { winner: null };
         }
     },
