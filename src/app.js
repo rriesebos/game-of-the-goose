@@ -3,8 +3,6 @@ import { Local, SocketIO } from 'boardgame.io/multiplayer'
 import { GooseGame } from './game';
 import { rulesets } from './rulesets';
 
-import { LobbyClient } from 'boardgame.io/client';
-
 import rollADie from './roll-a-die/roll-a-die';
 import ConfettiGenerator from 'confetti-js';
 
@@ -38,16 +36,12 @@ function SplashScreen(rootElement) {
     });
 }
 
-class GoosGameClient {
+class GooseGameClient {
     constructor(rootElement, { matchID, playerID, credentials }) {
         this.client = Client({
             game: GooseGame,
 
-            // TODO: make dynamic
-            numPlayers: 2,
-
             multiplayer: SocketIO({ server: 'localhost:8000' }),
-            // multiplayer: Local(),
 
             matchID: matchID,
             playerID: playerID,
@@ -208,10 +202,8 @@ class GoosGameClient {
             i += spacing;
         }
 
-        let previousPlayer = (ctx.playOrderPos + 1) % ctx.numPlayers;
-        let id = ctx.gameover ? ctx.currentPlayer : ctx.playOrder[previousPlayer];
-
-        let moveList = G.players[id].moveList;
+        let previousPlayerID = (ctx.gameover || ctx.turn === 1 || ctx.numPlayers === 1) ? ctx.currentPlayer : ctx.playOrder[ctx.playOrderPos - 1];
+        let moveList = G.players[previousPlayerID].moveList;
 
         // Stuck on tile, show info text
         if (ctx.turn > 1 && moveList.length === 0) {
@@ -221,7 +213,7 @@ class GoosGameClient {
         // Animate moving player, scale animation time by number of moves
         for (let [from, to] of moveList) {
             let duration = Math.round(Math.min(500, 1000 / Math.abs(from - to)));
-            await this.animatePlayer(G, ctx, id, from, to, duration);
+            await this.animatePlayer(G, ctx, previousPlayerID, from, to, duration);
         }
 
         // Enable roll button for current player
@@ -308,49 +300,10 @@ class GoosGameClient {
 class App {
     constructor(rootElement) {
         this.client = SplashScreen(rootElement).then((playerID) => {
-            return new GoosGameClient(rootElement, { playerID });
+            return new GooseGameClient(rootElement, { matchID: 'W-Jh_Dk1Pft', playerID, credentials: 'bTJgI31ld548TL0FKOM9Q' });
         });
     }
 }
 
-
 const appElement = document.querySelector('.app-container');
 new App(appElement);
-
-// const appElement = document.querySelector('.app-container');
-// const playerIDs = ['0', '1'];
-// const clients = playerIDs.map(playerID => {
-//     const rootElement = document.createElement('div');
-//     appElement.append(rootElement);
-//     return new GoosGameClient(rootElement, { matchID: '', playerID: playerID, credentials: '' });
-// });
-
-// const lobbyClient = new LobbyClient({ server: 'http://localhost:8000' });
-
-// lobbyClient.listGames()
-//     .then(console.log)
-//     .catch(console.error);
-
-// lobbyClient.createMatch('game-of-the-goose', {
-//         numPlayers: 2
-//     })
-//     .then(console.log)
-//     .catch(console.error);
-
-// lobbyClient.listMatches('game-of-the-goose')
-//     .then((matches) => {
-//         console.log(matches);
-
-//         lobbyClient.joinMatch(
-//                 'game-of-the-goose',
-//                 matches.matches[0].matchID, {
-//                     playerID: '1',
-//                     playerName: 'Bob',
-//                 }
-//             ).then((test) => {
-//                 const appElement = document.querySelector('.app-container');
-//                 new GoosGameClient(appElement, { matchID: matches.matches[0].matchID, playerID: '1', credentials: test.playerCredentials });
-//             })
-//             .catch(console.error);
-//     })
-//     .catch(console.error);
