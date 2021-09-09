@@ -21,6 +21,7 @@ export const GooseGame = {
         }
 
         return {
+            started: false,
             ruleset: setupData.ruleset,
             dice: null,
             rollDice: false,
@@ -30,6 +31,10 @@ export const GooseGame = {
     },
 
     moves: {
+        startGame: (G, ctx) => {
+            G.started = true;
+            ctx.log.setMetadata(`Started game`);
+        },
         rollDice: (G, ctx) => {
             const DICE_COUNT = rulesets[G.ruleset].DICE_COUNT;
             const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
