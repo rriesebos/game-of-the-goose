@@ -53,12 +53,16 @@ body {
 }
 
 #roll-button {
-    position: relative;
     top: 5rem;
+}
+
+.button {
+    position: relative;
     background-color: #f14e4e;
     align-self: center;
     display: inline-block;
-    padding: 0.3em 1.6em;
+    padding: 0.6rem 1.6rem;
+    margin-top: 1rem;
     border: 0.2em solid rgba(255, 255, 255, 0);
     border-radius: 0.6em;
     font-size: 1.5em;
@@ -70,16 +74,15 @@ body {
     cursor: pointer;
 }
 
-#roll-button:hover {
+.button:hover {
     border-color: rgba(255, 255, 255, 1);
 }
 
-#roll-button:active {
-    top: 5.2rem;
+.button:active {
+    transform: translateY(0.2rem);
 }
 
-#roll-button:disabled {
-    top: 5rem;
+.button:disabled {
     background-color: #ccc;
     border-color: #ccc;
     color: #666;
