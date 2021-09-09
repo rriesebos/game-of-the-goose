@@ -1,5 +1,5 @@
 import { Client } from 'boardgame.io/client';
-import { Local, SocketIO } from 'boardgame.io/multiplayer'
+import { SocketIO } from 'boardgame.io/multiplayer'
 import { GooseGame } from './game';
 import { rulesets } from './rulesets';
 
@@ -21,6 +21,9 @@ const PLAYER_IMAGE_MAP = {
     '4': player4Img,
     '5': player5Img,
 }
+
+const INFO_TEXT_DURATION_SHORT = 2000;
+const INFO_TEXT_DURATION_LONG = 4000;
 
 function SplashScreen(rootElement) {
     return new Promise((resolve) => {
@@ -67,6 +70,7 @@ class GooseGameClient {
 
         this.lastTurn = 0;
         this.rollingDice = false;
+        this.playerNames = {};
     }
 
     createBoard() {
@@ -153,10 +157,18 @@ class GooseGameClient {
         }
     }
 
+    updatePlayerNames() {
+        for (const player of this.client.matchData) {
+            this.playerNames[player.id.toString()] = player.name;
+        }
+    }
+
     async update(state) {
         if (state === null) {
             return;
         }
+
+        this.updatePlayerNames();
 
         const { G, ctx } = state;
 
@@ -207,7 +219,7 @@ class GooseGameClient {
 
         // Stuck on tile, show info text
         if (ctx.turn > 1 && moveList.length === 0) {
-            this.showInfoText(G.infoText, 3000);
+            this.showInfoText(G.infoText, INFO_TEXT_DURATION_SHORT);
         }
 
         // Animate moving player, scale animation time by number of moves
@@ -224,7 +236,7 @@ class GooseGameClient {
 
             if (ctx.gameover.winner) {
                 this.confetti.render();
-                this.showInfoText(`${ctx.gameover.winner} won!`, -1);
+                this.showInfoText(`${this.playerNames[ctx.gameover.winner]} won!`, -1);
             } else {
                 this.showInfoText('All players are stuck! The game ends in a draw.', -1);
             }
@@ -257,7 +269,7 @@ class GooseGameClient {
             const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
             if (i in TILE_EVENT_MAP && TILE_EVENT_MAP[i].condition(G, ctx) &&
                 i === to && G.infoText) {
-                await this.showInfoText(G.infoText, 5000);
+                await this.showInfoText(G.infoText, INFO_TEXT_DURATION_LONG);
             }
 
             // Wait between adding images
@@ -300,7 +312,7 @@ class GooseGameClient {
 class App {
     constructor(rootElement) {
         this.client = SplashScreen(rootElement).then((playerID) => {
-            return new GooseGameClient(rootElement, { matchID: 'W-Jh_Dk1Pft', playerID, credentials: 'bTJgI31ld548TL0FKOM9Q' });
+            return new GooseGameClient(rootElement, { matchID: '02gAvgPhqMF', playerID, credentials: '2WvC30oXPQ7RrDN8JBfnY' });
         });
     }
 }
