@@ -57,7 +57,7 @@ export const GooseGame = {
             if (G.players[ctx.currentPlayer].stuck) {
                 if (!TILE_EVENT_MAP[G.players[ctx.currentPlayer].tileNumber].escapeCondition(G, ctx)) {
 
-                    G.infoText = "Skipped turn.";
+                    G.infoText = "Player is stuck, skipped turn.";
 
                     ctx.events.endTurn();
                     return;
