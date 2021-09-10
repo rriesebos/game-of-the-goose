@@ -116,6 +116,8 @@ class GooseGameClient {
     }
 
     async createMatch() {
+        this.playerNames = {};
+
         this.match = await this.lobbyClient.createMatch(GooseGame.name, {
             numPlayers: parseInt(this.numPlayersInput.value),
             setupData: { ruleset: this.rulesetSelector.value }
@@ -159,7 +161,7 @@ class GooseGameClient {
             return;
         }
 
-        this.client.moves.startGame();
+        this.client.moves.startGame(this.playerNames);
     }
 
     createBoard() {
@@ -254,7 +256,9 @@ class GooseGameClient {
 
     updatePlayerNames() {
         for (const player of this.client.matchData) {
-            this.playerNames[player.id.toString()] = player.name;
+            if (player.name) {
+                this.playerNames[player.id.toString()] = player.name;
+            }
         }
     }
 
@@ -339,7 +343,7 @@ class GooseGameClient {
 
             if (ctx.gameover.winner) {
                 this.confetti.render();
-                this.showInfoText(`${this.playerNames[ctx.gameover.winner]} won!`, -1);
+                this.showInfoText(`${ctx.gameover.winner} won!`, -1);
             } else {
                 this.showInfoText('All players are stuck! The game ends in a draw.', -1);
             }
