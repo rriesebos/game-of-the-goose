@@ -89,7 +89,7 @@ class GooseGameClient {
             <label for="num-players">Number of players (1-6):</label>
             <input type="number" id="num-players" name="num-players" value="4" min="1" max="6">
 
-            <button id="start-match-button" class="button">Start match</button>
+            <button id="start-match-button" class="button" disabled>Start match</button>
         `;
 
         this.matchIdInput = this.rootElement.querySelector('#match-id');
@@ -123,6 +123,8 @@ class GooseGameClient {
             setupData: { ruleset: this.rulesetSelector.value }
         });
         console.log(this.match);
+
+        this.startMatchButton.disabled = false;
     }
 
     async getMatch(matchID) {
@@ -147,7 +149,7 @@ class GooseGameClient {
             GooseGame.name,
             matchID, {
                 playerID: playerID,
-                playerName: this.playerNameInput.value,
+                playerName: this.playerNameInput.value === '' ? "Player " + playerID : this.playerNameInput.value,
             }
         )
 
@@ -164,7 +166,7 @@ class GooseGameClient {
         this.client.moves.startGame(this.playerNames);
     }
 
-    createBoard() {
+    createBoard(ruleset) {
         this.boardVisible = true;
 
         this.rootElement.innerHTML = `
@@ -172,73 +174,79 @@ class GooseGameClient {
             <canvas id="confetti-canvas"></canvas>
             <button id="roll-button" class="button" disabled><span>Roll</span></button>
             <div class="board">
-                <div id="tile0" data-id="0" class="tile special">0</div>
-                <div id="tile1" data-id="1" class="tile">1</div>
-                <div id="tile2" data-id="2" class="tile">2</div>
-                <div id="tile3" data-id="3" class="tile">3</div>
-                <div id="tile4" data-id="4" class="tile">4</div>
-                <div id="tile5" data-id="5" class="tile">5</div>
-                <div id="tile6" data-id="6" class="tile">6</div>
-                <div id="tile7" data-id="7" class="tile">7</div>
-                <div id="tile8" data-id="8" class="tile">8</div>
-                <div id="tile9" data-id="9" class="tile">9</div>
-                <div id="tile10" data-id="10" class="tile">10</div>
-                <div id="tile11" data-id="11" class="tile">11</div>
-                <div id="tile31" data-id="31" class="tile">31</div>
-                <div id="tile32" data-id="32" class="tile">32</div>
-                <div id="tile33" data-id="33" class="tile">33</div>
-                <div id="tile34" data-id="34" class="tile">34</div>
-                <div id="tile35" data-id="35" class="tile">35</div>
-                <div id="tile36" data-id="36" class="tile">36</div>
-                <div id="tile37" data-id="37" class="tile">37</div>
-                <div id="tile38" data-id="38" class="tile">38</div>
-                <div id="tile39" data-id="39" class="tile">39</div>
-                <div id="tile40" data-id="40" class="tile">40</div>
-                <div id="tile41" data-id="41" class="tile">41</div>
-                <div id="tile12" data-id="12" class="tile">12</div>
-                <div id="tile30" data-id="30" class="tile">30</div>
-                <div id="tile55" data-id="55" class="tile">55</div>
-                <div id="tile56" data-id="56" class="tile">56</div>
-                <div id="tile57" data-id="57" class="tile">57</div>
-                <div id="tile58" data-id="58" class="tile">58</div>
-                <div id="tile59" data-id="59" class="tile">59</div>
-                <div id="tile60" data-id="60" class="tile">60</div>
-                <div id="tile61" data-id="61" class="tile">61</div>
-                <div id="tile62" data-id="62" class="tile">62</div>
-                <div id="tile63" data-id="63" class="tile special">63</div>
-                <div id="tile42" data-id="42" class="tile">42</div>
-                <div id="tile13" data-id="13" class="tile">13</div>
-                <div id="tile29" data-id="29" class="tile">29</div>
-                <div id="tile54" data-id="54" class="tile">54</div>
-                <div id="space"></div>
-                <div id="tile43" data-id="43" class="tile">43</div>
-                <div id="tile14" data-id="14" class="tile">14</div>
-                <div id="tile28" data-id="28" class="tile">28</div>
-                <div id="tile53" data-id="53" class="tile">53</div>
-                <div id="tile52" data-id="52" class="tile">52</div>
-                <div id="tile51" data-id="51" class="tile">51</div>
-                <div id="tile50" data-id="50" class="tile">50</div>
-                <div id="tile49" data-id="49" class="tile">49</div>
-                <div id="tile48" data-id="48" class="tile">48</div>
-                <div id="tile47" data-id="47" class="tile">47</div>
-                <div id="tile46" data-id="46" class="tile">46</div>
-                <div id="tile45" data-id="45" class="tile">45</div>
-                <div id="tile44" data-id="44" class="tile">44</div>
-                <div id="tile15" data-id="15" class="tile">15</div>
-                <div id="tile27" data-id="27" class="tile">27</div>
-                <div id="tile26" data-id="26" class="tile">26</div>
-                <div id="tile25" data-id="25" class="tile">25</div>
-                <div id="tile24" data-id="24" class="tile">24</div>
-                <div id="tile23" data-id="23" class="tile">23</div>
-                <div id="tile22" data-id="22" class="tile">22</div>
-                <div id="tile21" data-id="21" class="tile">21</div>
-                <div id="tile20" data-id="20" class="tile">20</div>
-                <div id="tile19" data-id="19" class="tile">19</div>
-                <div id="tile18" data-id="18" class="tile">18</div>
-                <div id="tile17" data-id="17" class="tile">17</div>
-                <div id="tile16" data-id="16" class="tile">16</div>
-            </div>
+            <div id="tile0" data-id="0" class="tile special"><span>0</span></div>
+            <div id="tile1" data-id="1" class="tile"><span>1</span></div>
+            <div id="tile2" data-id="2" class="tile"><span>2</span></div>
+            <div id="tile3" data-id="3" class="tile"><span>3</span></div>
+            <div id="tile4" data-id="4" class="tile"><span>4</span></div>
+            <div id="tile5" data-id="5" class="tile"><span>5</span></div>
+            <div id="tile6" data-id="6" class="tile"><span>6</span></div>
+            <div id="tile7" data-id="7" class="tile"><span>7</span></div>
+            <div id="tile8" data-id="8" class="tile"><span>8</span></div>
+            <div id="tile9" data-id="9" class="tile"><span>9</span></div>
+            <div id="tile10" data-id="10" class="tile"><span>10</span></div>
+            <div id="tile11" data-id="11" class="tile"><span>11</span></div>
+            <div id="tile31" data-id="31" class="tile"><span>31</span></div>
+            <div id="tile32" data-id="32" class="tile"><span>32</span></div>
+            <div id="tile33" data-id="33" class="tile"><span>33</span></div>
+            <div id="tile34" data-id="34" class="tile"><span>34</span></div>
+            <div id="tile35" data-id="35" class="tile"><span>35</span></div>
+            <div id="tile36" data-id="36" class="tile"><span>36</span></div>
+            <div id="tile37" data-id="37" class="tile"><span>37</span></div>
+            <div id="tile38" data-id="38" class="tile"><span>38</span></div>
+            <div id="tile39" data-id="39" class="tile"><span>39</span></div>
+            <div id="tile40" data-id="40" class="tile"><span>40</span></div>
+            <div id="tile41" data-id="41" class="tile"><span>41</span></div>
+            <div id="tile12" data-id="12" class="tile"><span>12</span></div>
+            <div id="tile30" data-id="30" class="tile"><span>30</span></div>
+            <div id="tile55" data-id="55" class="tile"><span>55</span></div>
+            <div id="tile56" data-id="56" class="tile"><span>56</span></div>
+            <div id="tile57" data-id="57" class="tile"><span>57</span></div>
+            <div id="tile58" data-id="58" class="tile"><span>58</span></div>
+            <div id="tile59" data-id="59" class="tile"><span>59</span></div>
+            <div id="tile60" data-id="60" class="tile"><span>60</span></div>
+            <div id="tile61" data-id="61" class="tile"><span>61</span></div>
+            <div id="tile62" data-id="62" class="tile"><span>62</span></div>
+            <div id="tile63" data-id="63" class="tile special"><span>63</span></div>
+            <div id="tile42" data-id="42" class="tile"><span>42</span></div>
+            <div id="tile13" data-id="13" class="tile"><span>13</span></div>
+            <div id="tile29" data-id="29" class="tile"><span>29</span></div>
+            <div id="tile54" data-id="54" class="tile"><span>54</span></div>
+            <div id="space"></div>
+            <div id="tile43" data-id="43" class="tile"><span>43</span></div>
+            <div id="tile14" data-id="14" class="tile"><span>14</span></div>
+            <div id="tile28" data-id="28" class="tile"><span>28</span></div>
+            <div id="tile53" data-id="53" class="tile"><span>53</span></div>
+            <div id="tile52" data-id="52" class="tile"><span>52</span></div>
+            <div id="tile51" data-id="51" class="tile"><span>51</span></div>
+            <div id="tile50" data-id="50" class="tile"><span>50</span></div>
+            <div id="tile49" data-id="49" class="tile"><span>49</span></div>
+            <div id="tile48" data-id="48" class="tile"><span>48</span></div>
+            <div id="tile47" data-id="47" class="tile"><span>47</span></div>
+            <div id="tile46" data-id="46" class="tile"><span>46</span></div>
+            <div id="tile45" data-id="45" class="tile"><span>45</span></div>
+            <div id="tile44" data-id="44" class="tile"><span>44</span></div>
+            <div id="tile15" data-id="15" class="tile"><span>15</span></div>
+            <div id="tile27" data-id="27" class="tile"><span>27</span></div>
+            <div id="tile26" data-id="26" class="tile"><span>26</span></div>
+            <div id="tile25" data-id="25" class="tile"><span>25</span></div>
+            <div id="tile24" data-id="24" class="tile"><span>24</span></div>
+            <div id="tile23" data-id="23" class="tile"><span>23</span></div>
+            <div id="tile22" data-id="22" class="tile"><span>22</span></div>
+            <div id="tile21" data-id="21" class="tile"><span>21</span></div>
+            <div id="tile20" data-id="20" class="tile"><span>20</span></div>
+            <div id="tile19" data-id="19" class="tile"><span>19</span></div>
+            <div id="tile18" data-id="18" class="tile"><span>18</span></div>
+            <div id="tile17" data-id="17" class="tile"><span>17</span></div>
+            <div id="tile16" data-id="16" class="tile"><span>16</span></div>
+        </div>
         `;
+
+        // Add class to move again tiles
+        for (const tile of rulesets[ruleset].MOVE_AGAIN_TILES) {
+            const moveAgainTile = this.rootElement.querySelector(`[data-id='${tile}']`);
+            moveAgainTile.classList.add('move-again');
+        }
 
         this.infoContainer = this.rootElement.querySelector('#info-container');
         this.rollButton = this.rootElement.querySelector('#roll-button');
@@ -267,16 +275,15 @@ class GooseGameClient {
             return;
         }
 
-        this.updatePlayerNames();
-
         const { G, ctx } = state;
 
         if (!G.started) {
+            this.updatePlayerNames();
             return;
         }
 
         if (!this.boardVisible) {
-            this.createBoard();
+            this.createBoard(G.ruleset);
         }
 
         // Play roll animation when needed
@@ -307,7 +314,7 @@ class GooseGameClient {
         // Clear all tiles
         const tiles = this.rootElement.querySelectorAll('.tile');
         tiles.forEach(tile => {
-            tile.innerHTML = tile.dataset.id;
+            tile.innerHTML = `<span>${tile.dataset.id}</span>`;
         });
 
         const spacing = 11 / ctx.numPlayers;
