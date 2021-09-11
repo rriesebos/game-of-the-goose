@@ -33,17 +33,14 @@ export const GooseGame = {
 
     moves: {
         startGame: (G, ctx, playerList) => {
-            let players = {};
             for (const [playerID, playerName] of Object.entries(playerList)) {
-                players[playerID] = {
+                G.players[playerID] = {
                     ...G.players[playerID],
                     name: playerName,
                 };
             }
 
-            G.players = players;
             G.started = true;
-
             ctx.log.setMetadata(`Started game`);
         },
         rollDice: (G, ctx) => {
