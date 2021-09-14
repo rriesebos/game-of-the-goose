@@ -4,6 +4,10 @@ export const GooseGame = {
     name: 'game-of-the-goose',
 
     setup: (ctx, setupData) => {
+        if (!setupData) {
+            setupData = { ruleset: 'modern' };
+        }
+
         let players = {};
         for (let i = 0; i < ctx.numPlayers; i++) {
             players[i.toString()] = {
