@@ -17,9 +17,9 @@ rulesetSelector.innerHTML = rulesetOptions;
 
 createMatchButton.onclick = () => createMatch();
 
-const lobbyClient = new LobbyClient({ server: SERVER_URL });
-
 async function createMatch() {
+    const lobbyClient = new LobbyClient({ server: SERVER_URL });
+
     const match = await lobbyClient.createMatch(GooseGame.name, {
         numPlayers: parseInt(numPlayersInput.value),
         setupData: { ruleset: rulesetSelector.value }
@@ -27,5 +27,5 @@ async function createMatch() {
 
     console.log(match);
 
-    window.location.href = "/game.html";
+    window.location.href = `/game.html?matchID=${match.matchID}`;
 }
