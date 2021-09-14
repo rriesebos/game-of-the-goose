@@ -3,8 +3,7 @@ import { GooseGame } from './game';
 import { SERVER_URL } from './constants';
 
 // TODO: lobby with list of player names and colors (goose images)
-// TODO: match invite link
-// TODO: leave button, onbeforeunload
+// TODO: leave button, onbeforeunload (clear session storage, redirect?)
 // TODO: Lobby owner indicator
 // TODO: add player count indicator, disable start when room is not full?
 
@@ -14,10 +13,20 @@ export class GooseGameLobby {
 
         this.rootElement = rootElement;
         this.client = client;
-        this.matchID = null;
 
-        this.createLobby();
-        this.joinMatch();
+        const params = (new URL(document.location)).searchParams;
+        this.matchID = params.get('matchID');
+
+        // Retrieve player information from session storage
+        this.playerID = sessionStorage.getItem('playerID');
+        this.playerName = sessionStorage.getItem('playerName');
+
+        this.validateMatch(this.matchID)
+            .then((playerID) => {
+                this.createLobby();
+                this.joinMatch(playerID);
+            })
+            .catch((err) => this.showError(err));
     }
 
     async createLobby() {
@@ -46,6 +55,13 @@ export class GooseGameLobby {
 
         this.startMatchButton.onclick = () => this.startMatch();
         this.matchInviteLinkCopyBox.onclick = () => this.copyMatchInvite();
+
+        // Update match invite link
+        // TODO: update url
+        this.matchInviteLinkInput.value = `localhost:1234/index.html?matchID=${this.matchID}`;
+
+        // Enable start button if the player is the first player (game creator if no one leaves)
+        this.startMatchButton.disabled = this.client.playerID !== '0';
     }
 
     getMatch(matchID) {
@@ -68,33 +84,11 @@ export class GooseGameLobby {
         return openSpot.id.toString();
     }
 
-    async joinMatch() {
-        // TODO: prevent refreshing from causing a rejoin (local storage)
-        const params = (new URL(document.location)).searchParams;
-        this.matchID = params.get('matchID');
-
-        // Redirect to index.html if match id is not set
-        if (!this.matchID) {
-            window.location.href = '/index.html';
+    async joinMatch(playerID) {
+        // Check if the client has already joined
+        if (this.client.playerID && this.client.playerID === this.playerID) {
             return;
         }
-
-        let playerID = -1;
-        try {
-            playerID = await this.getPlayerId(this.matchID);
-        } catch (err) {
-            this.showError('Invalid match ID.');
-            return;
-        }
-
-        if (playerID === -1) {
-            this.showError('Room is full.');
-            return;
-        }
-
-        // Update match invite link
-        // TODO: update
-        this.matchInviteLinkInput.value = `localhost:1234/game.html?matchID=${this.matchID}`;
 
         // Enable start button if the player is the first player (game creator if no one leaves)
         this.startMatchButton.disabled = playerID !== '0';
@@ -103,15 +97,42 @@ export class GooseGameLobby {
             GooseGame.name,
             this.matchID, {
                 playerID: playerID,
-                // TODO: get from local storage
-                // playerName: this.playerNameInput.value === '' ? "Player " + playerID : this.playerNameInput.value,
-                playerName: "Player " + playerID,
+                playerName: !this.playerName || this.playerName === '' ? "Player " + playerID : this.playerName,
             }
         );
 
         this.client.updateMatchID(this.matchID);
         this.client.updatePlayerID(playerID);
         this.client.updateCredentials(playerCredentials);
+
+        // Store current session variables
+        sessionStorage.setItem('matchID', this.matchID);
+        sessionStorage.setItem('playerID', playerID);
+        sessionStorage.setItem('playerCredentials', playerCredentials);
+    }
+
+    async validateMatch(matchID) {
+        if (this.playerID) {
+            return this.playerID;
+        }
+
+        // Redirect to index.html if match id is not set
+        if (!matchID) {
+            throw 'Match ID not set.';
+        }
+
+        let playerID = -1;
+        try {
+            playerID = await this.getPlayerId(matchID);
+        } catch (err) {
+            throw 'Invalid match ID.';
+        }
+
+        if (playerID === -1) {
+            throw 'Match is full.';
+        }
+
+        return playerID;
     }
 
     updatePlayers(playerNames) {
