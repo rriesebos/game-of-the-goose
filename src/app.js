@@ -232,7 +232,7 @@ class GooseGameClient {
 
         // Stuck on tile, show info text
         if (ctx.turn > 1 && moveList.length === 0) {
-            this.showInfoText(G.infoText, INFO_TEXT_DURATION_SHORT);
+            await this.showInfoText(G.infoText, INFO_TEXT_DURATION_SHORT);
         }
 
         // Animate moving player, scale animation time by number of moves
