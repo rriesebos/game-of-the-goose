@@ -2,89 +2,100 @@ import { LobbyClient } from 'boardgame.io/client';
 import { GooseGame } from './game';
 import { SERVER_URL } from './constants';
 
+// TODO: lobby with list of player names and colors (goose images)
+// TODO: match invite link
+// TODO: start game button (only enabled for the lobby owner)
+// TODO: leave button, onbeforeunload
+// TODO: Lobby owner indicator
+// TODO: (You) indicator
+
 export class GooseGameLobby {
     constructor(rootElement, client) {
         this.lobbyClient = new LobbyClient({ server: SERVER_URL });
 
         this.rootElement = rootElement;
         this.client = client;
+        this.matchID = null;
 
         this.createLobby();
-
-        this.matchIdInput = this.rootElement.querySelector('#match-id');
-        this.playerNameInput = this.rootElement.querySelector('#player-name');
-
-        this.showMatchButton = this.rootElement.querySelector('#show-match-button');
-        this.showMatchesButton = this.rootElement.querySelector('#show-matches-button');
-        this.joinMatchButton = this.rootElement.querySelector('#join-match-button');
-        this.startMatchButton = this.rootElement.querySelector('#start-match-button');
-
-        this.attachListeners();
-
-        this.match = null;
+        this.joinMatch();
     }
 
     createLobby() {
         this.rootElement.innerHTML = `
-            <button id="show-match-button" class="button">Show match</button>
-            <button id="show-matches-button" class="button">Show matches</button>
-            <button id="join-match-button" class="button">Join match</button>
-    
-            <label for="match-id">Match ID:</label>
-            <input type="text" id="match-id" name="match-id" placeholder="Enter the match ID">
-    
-            <label for="player-name">Player name:</label>
-            <input type="text" id="player-name" name="player-name" placeholder="Enter your name">
-    
-            <button id="start-match-button" class="button" disabled>Start match</button>
+            <div id="player-list"></div>
+            <button id="start-match-button" class="button">Start match</button>
         `;
-    }
 
-    attachListeners() {
-        this.showMatchButton.onclick = () => this.getMatch(this.match.matchID);
+        this.startMatchButton = this.rootElement.querySelector('#start-match-button');
+        this.playerList = this.rootElement.querySelector('#player-list');
 
-        this.showMatchesButton.onclick = async() => {
-            const matches = await this.lobbyClient.listMatches(GooseGame.name);
-            console.log(matches);
-        }
-
-        this.joinMatchButton.onclick = () => this.joinMatch();
         this.startMatchButton.onclick = () => this.startMatch();
     }
 
     async getMatch(matchID) {
-        const match = await this.lobbyClient.getMatch(GooseGame.name, matchID);
-        console.log(match);
-        return match;
+        return await this.lobbyClient.getMatch(GooseGame.name, matchID);
     }
 
     async getPlayerId(matchID) {
         const { players } = await this.getMatch(matchID);
-        return players.find((player) => !player.name).id.toString();
+        const openSpot = players.find((player) => !player.name);
+
+        if (!openSpot) {
+            return null;
+        }
+
+        return openSpot.id.toString();
     }
 
     async joinMatch() {
-        let matchID = this.matchIdInput.value;
-        if (!matchID || matchID === '') {
-            matchID = this.match.matchID;
+        // TODO: prevent refreshing from causing a rejoin (local storage)
+        const params = (new URL(document.location)).searchParams;
+        this.matchID = params.get('matchID');
+
+        // Redirect to index.html if match id is not set
+        if (!this.matchID) {
+            window.location.href = '/index.html';
+            return;
         }
 
-        const playerID = await this.getPlayerId(matchID);
+        const playerID = await this.getPlayerId(this.matchID);
+
+        if (!playerID) {
+            this.rootElement.innerHTML = '<h2>Room is full.</h2>';
+            return;
+        }
+
         const { playerCredentials } = await this.lobbyClient.joinMatch(
             GooseGame.name,
-            matchID, {
+            this.matchID, {
                 playerID: playerID,
-                playerName: this.playerNameInput.value === '' ? "Player " + playerID : this.playerNameInput.value,
+                // TODO: get from local storage
+                // playerName: this.playerNameInput.value === '' ? "Player " + playerID : this.playerNameInput.value,
+                playerName: "Player " + playerID,
             }
-        )
+        );
 
-        this.client.updateMatchID(matchID);
+        this.client.updateMatchID(this.matchID);
         this.client.updatePlayerID(playerID);
         this.client.updateCredentials(playerCredentials);
     }
 
+    updatePlayers(playerNames) {
+        this.playerNames = playerNames;
+
+        // TODO: update player list
+        let playerListHTML = '';
+        for (let i = 0; i < playerNames.length; i++) {
+            // TODO: add goose images
+            playerListHTML += `<div>${playerNames[i]}</div>`;
+        }
+
+        this.playerList.innerHTML = playerListHTML;
+    }
+
     startMatch() {
-        if (!this.match) {
+        if (!this.matchID) {
             return;
         }
 
