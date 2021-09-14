@@ -4,10 +4,8 @@ import { SERVER_URL } from './constants';
 
 // TODO: lobby with list of player names and colors (goose images)
 // TODO: match invite link
-// TODO: start game button (only enabled for the lobby owner)
 // TODO: leave button, onbeforeunload
 // TODO: Lobby owner indicator
-// TODO: (You) indicator
 
 export class GooseGameLobby {
     constructor(rootElement, client) {
@@ -21,10 +19,10 @@ export class GooseGameLobby {
         this.joinMatch();
     }
 
-    createLobby() {
+    async createLobby() {
         this.rootElement.innerHTML = `
             <div id="player-list"></div>
-            <button id="start-match-button" class="button">Start match</button>
+            <button id="start-match-button" class="button" disabled>Start match</button>
         `;
 
         this.startMatchButton = this.rootElement.querySelector('#start-match-button');
@@ -33,16 +31,21 @@ export class GooseGameLobby {
         this.startMatchButton.onclick = () => this.startMatch();
     }
 
-    async getMatch(matchID) {
-        return await this.lobbyClient.getMatch(GooseGame.name, matchID);
+    getMatch(matchID) {
+        return this.lobbyClient.getMatch(GooseGame.name, matchID)
     }
 
     async getPlayerId(matchID) {
-        const { players } = await this.getMatch(matchID);
-        const openSpot = players.find((player) => !player.name);
+        let match = null;
+        try {
+            match = await this.getMatch(matchID);
+        } catch (err) {
+            throw err;
+        }
 
+        const openSpot = match.players.find((player) => !player.name);
         if (!openSpot) {
-            return null;
+            return -1;
         }
 
         return openSpot.id.toString();
@@ -59,12 +62,24 @@ export class GooseGameLobby {
             return;
         }
 
-        const playerID = await this.getPlayerId(this.matchID);
-
-        if (!playerID) {
-            this.rootElement.innerHTML = '<h2>Room is full.</h2>';
+        let playerID = -1;
+        try {
+            playerID = await this.getPlayerId(this.matchID);
+        } catch (err) {
+            window.location.href = '/index.html';
             return;
         }
+
+        if (playerID === -1) {
+            this.rootElement.innerHTML = `
+                <h2>Room is full.</h2>
+                <button class="button" onclick="window.location.href = '/index.html'">Back to home</button>
+            `;
+            return;
+        }
+
+        // Enable start button if the player is the first player (game creator if no one leaves)
+        this.startMatchButton.disabled = playerID !== '0';
 
         const { playerCredentials } = await this.lobbyClient.joinMatch(
             GooseGame.name,
@@ -88,7 +103,11 @@ export class GooseGameLobby {
         let playerListHTML = '';
         for (let i = 0; i < playerNames.length; i++) {
             // TODO: add goose images
-            playerListHTML += `<div>${playerNames[i]}</div>`;
+            if (i.toString() === this.client.playerID) {
+                playerListHTML += `<div>${playerNames[i]} (You)</div>`;
+            } else {
+                playerListHTML += `<div>${playerNames[i]}</div>`;
+            }
         }
 
         this.playerList.innerHTML = playerListHTML;
