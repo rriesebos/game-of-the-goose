@@ -1,5 +1,3 @@
-// TODO: store player name in local storage
-
 const playerNameInput = document.querySelector('#player-name');
 const matchIdInput = document.querySelector('#match-id');
 
