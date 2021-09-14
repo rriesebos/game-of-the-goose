@@ -1,7 +1,6 @@
 import { LobbyClient } from 'boardgame.io/client';
-import { rulesets } from './rulesets';
 import { GooseGame } from './game';
-import { SERVER_URL } from './app';
+import { SERVER_URL } from './constants';
 
 export class GooseGameLobby {
     constructor(rootElement, client) {
@@ -14,10 +13,7 @@ export class GooseGameLobby {
 
         this.matchIdInput = this.rootElement.querySelector('#match-id');
         this.playerNameInput = this.rootElement.querySelector('#player-name');
-        this.rulesetSelector = this.rootElement.querySelector('#ruleset-selector');
-        this.numPlayersInput = this.rootElement.querySelector('#num-players');
 
-        this.createMatchButton = this.rootElement.querySelector('#create-match-button');
         this.showMatchButton = this.rootElement.querySelector('#show-match-button');
         this.showMatchesButton = this.rootElement.querySelector('#show-matches-button');
         this.joinMatchButton = this.rootElement.querySelector('#join-match-button');
@@ -29,13 +25,7 @@ export class GooseGameLobby {
     }
 
     createLobby() {
-        let rulesetOptions = '';
-        for (const ruleset of Object.keys(rulesets)) {
-            rulesetOptions += `<option value="${ruleset}">${ruleset}</option>\n`
-        }
-
         this.rootElement.innerHTML = `
-            <button id="create-match-button" class="button">Create match</button>
             <button id="show-match-button" class="button">Show match</button>
             <button id="show-matches-button" class="button">Show matches</button>
             <button id="join-match-button" class="button">Join match</button>
@@ -46,21 +36,12 @@ export class GooseGameLobby {
             <label for="player-name">Player name:</label>
             <input type="text" id="player-name" name="player-name" placeholder="Enter your name">
     
-            <label for="rulesets">Choose a ruleset:</label>
-            <select id="ruleset-selector" name="rulesets">
-                ${rulesetOptions}
-            </select> 
-    
-            <label for="num-players">Number of players (1-6):</label>
-            <input type="number" id="num-players" name="num-players" value="4" min="1" max="6">
-    
             <button id="start-match-button" class="button" disabled>Start match</button>
         `;
     }
 
     attachListeners() {
         this.showMatchButton.onclick = () => this.getMatch(this.match.matchID);
-        this.createMatchButton.onclick = () => this.createMatch();
 
         this.showMatchesButton.onclick = async() => {
             const matches = await this.lobbyClient.listMatches(GooseGame.name);
@@ -69,18 +50,6 @@ export class GooseGameLobby {
 
         this.joinMatchButton.onclick = () => this.joinMatch();
         this.startMatchButton.onclick = () => this.startMatch();
-    }
-
-    async createMatch() {
-        this.playerNames = {};
-
-        this.match = await this.lobbyClient.createMatch(GooseGame.name, {
-            numPlayers: parseInt(this.numPlayersInput.value),
-            setupData: { ruleset: this.rulesetSelector.value }
-        });
-        console.log(this.match);
-
-        this.startMatchButton.disabled = false;
     }
 
     async getMatch(matchID) {

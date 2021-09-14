@@ -6,20 +6,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/index.css">
 
-    <link rel="stylesheet" href="index.css">
-
-    <title>Game of the goose</title>
+    <title>Game of the Goose</title>
 </head>
 
 <body>
-    <div class="app-container">
-    </div>
+    <div class="container">
+        <h1>Game of the Goose</h1>
 
-    <script src="./src/app.js"></script>
+        <div>
+            <label for="player-name">Player name:</label>
+            <input type="text" id="player-name" name="player-name" placeholder="Enter your name">
+        </div>
+
+        <div>
+            <label for="match-id">Custom match ID:</label>
+            <input type="text" id="match-id" name="match-id" placeholder="(Optional) match ID">
+        </div>
+
+        <div class="main-buttons">
+            <button id="join-match-button" class="button">Join match</button>
+            <button id="new-match-button" class="button">New match</button>
+        </div>
+    </div>
 </body>
 
 </html>

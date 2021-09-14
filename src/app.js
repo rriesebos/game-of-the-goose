@@ -2,6 +2,7 @@ import { Client } from 'boardgame.io/client';
 import { SocketIO } from 'boardgame.io/multiplayer'
 import { GooseGame } from './game';
 import { rulesets } from './rulesets';
+import { SERVER_URL } from './constants';
 
 import { GooseGameLobby } from './lobby';
 
@@ -26,8 +27,6 @@ const PLAYER_IMAGE_MAP = {
 
 const INFO_TEXT_DURATION_SHORT = 2000;
 const INFO_TEXT_DURATION_LONG = 4000;
-
-export const SERVER_URL = 'http://localhost:8000';
 
 class GooseGameClient {
     constructor(rootElement, { matchID, playerID, credentials }) {
@@ -317,5 +316,5 @@ class GooseGameClient {
     }
 }
 
-const appElement = document.querySelector('.app-container');
+const appElement = document.querySelector('.container');
 new GooseGameClient(appElement, { matchID: '', playerID: '0', credentials: '' });
