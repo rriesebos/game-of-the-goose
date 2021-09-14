@@ -57,8 +57,18 @@ export const GooseGame = {
                 return;
             }
 
-            G.dice = ctx.random.D6(DICE_COUNT);
-            ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.dice}`);
+            // Only throw dice if the player is not stuck, or if there is a chance that a dice throw frees the player
+            if (!G.players[ctx.currentPlayer].stuck || !TILE_EVENT_MAP[G.players[ctx.currentPlayer].tileNumber].endGameIfAllStuck) {
+                G.dice = ctx.random.D6(DICE_COUNT);
+                ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.dice}`);
+
+                G.rollDice = true;
+            }
+        },
+        updatePlayer: (G, ctx) => {
+            const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
+
+            G.rollDice = false;
 
             // Check if the player is stuck, free player if the escape condition is met
             if (G.players[ctx.currentPlayer].stuck) {
@@ -72,11 +82,6 @@ export const GooseGame = {
 
                 G.players[ctx.currentPlayer].stuck = false;
             }
-
-            G.rollDice = true;
-        },
-        updatePlayer: (G, ctx) => {
-            G.rollDice = false;
 
             const diceSum = G.dice.reduce((a, b) => a + b, 0);
             movePlayer(G, ctx, diceSum, 1);
