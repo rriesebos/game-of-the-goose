@@ -56,3 +56,37 @@ label {
     display: block;
     margin-bottom: 0.5em;
 }
+
+.copy-box {
+    display: flex;
+    justify-content: space-between;
+    height: 32px;
+    cursor: pointer;
+    background-color: #058C42;
+    border-radius: 2px;
+    font-size: 14px;
+}
+
+.copy-box>.copy-input {
+    width: 80ch;
+    padding: 4px 12px;
+    font-family: monospace;
+    font-weight: 600;
+    line-height: 20px;
+    color: white;
+    background-color: inherit;
+    border: none;
+    border-radius: 2px;
+    overflow: visible;
+    cursor: pointer;
+    outline: none;
+}
+
+.copy-box>.copy-icon {
+    position: relative;
+    align-self: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    fill: white;
+}
