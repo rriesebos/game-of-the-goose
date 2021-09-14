@@ -6,6 +6,7 @@ import { SERVER_URL } from './constants';
 // TODO: match invite link
 // TODO: leave button, onbeforeunload
 // TODO: Lobby owner indicator
+// TODO: add player count indicator, disable start when room is not full?
 
 export class GooseGameLobby {
     constructor(rootElement, client) {
@@ -66,15 +67,12 @@ export class GooseGameLobby {
         try {
             playerID = await this.getPlayerId(this.matchID);
         } catch (err) {
-            window.location.href = '/index.html';
+            this.showError('Invalid match ID.');
             return;
         }
 
         if (playerID === -1) {
-            this.rootElement.innerHTML = `
-                <h2>Room is full.</h2>
-                <button class="button" onclick="window.location.href = '/index.html'">Back to home</button>
-            `;
+            this.showError('Room is full.');
             return;
         }
 
@@ -99,7 +97,6 @@ export class GooseGameLobby {
     updatePlayers(playerNames) {
         this.playerNames = playerNames;
 
-        // TODO: update player list
         let playerListHTML = '';
         for (let i = 0; i < playerNames.length; i++) {
             // TODO: add goose images
@@ -119,5 +116,11 @@ export class GooseGameLobby {
         }
 
         this.client.moves.startGame(this.playerNames);
+    }
+
+    showError(errorMessage) {
+        this.rootElement.innerHTML = '';
+        this.rootElement.innerText = errorMessage;
+        this.rootElement.innerHTML += `<button class="button" onclick="window.location.href = '/index.html'">Back to home</button>`;
     }
 }
