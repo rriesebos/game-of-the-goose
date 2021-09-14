@@ -55,7 +55,7 @@ class GooseGameClient {
         // Create lobby if the game has not yet started
         const state = this.client.getState();
         if (!state || !state.G.started) {
-            new GooseGameLobby(this.rootElement, this.client);
+            this.lobby = new GooseGameLobby(this.rootElement, this.client);
         }
     }
 
@@ -160,6 +160,10 @@ class GooseGameClient {
             if (player.name) {
                 this.playerNames[player.id.toString()] = player.name;
             }
+        }
+
+        if (this.lobby) {
+            this.lobby.updatePlayers(Object.values(this.playerNames));
         }
     }
 
