@@ -40,6 +40,7 @@
 
 .board {
     flex-grow: 1;
+    align-self: stretch;
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     row-gap: 10px;
@@ -83,7 +84,7 @@
 
 .tile>span {
     text-align: center;
-    width: 2.5ch;
+    width: fit-content;
     padding: 4px;
     background-color: white;
     border: 1px solid black;
