@@ -148,7 +148,6 @@ class GooseGameClient {
         this.confetti = new ConfettiGenerator({ target: 'confetti-canvas', max: 80, size: 1.6 });
 
         this.rollButton.onclick = () => {
-            this.rollButton.disabled = true;
             this.hideInfoText();
 
             this.client.moves.rollDice();
@@ -185,7 +184,9 @@ class GooseGameClient {
 
         // Play roll animation when needed
         if (G.rollDice && !this.rollingDice) {
+            this.rollButton.disabled = true;
             this.rollingDice = true;
+
             rollADie({
                 element: this.spaceElement,
                 numberOfDice: rulesets[G.ruleset].DICE_COUNT,
@@ -225,7 +226,8 @@ class GooseGameClient {
             i += spacing;
         }
 
-        let previousPlayerID = (ctx.gameover || ctx.turn === 1 || ctx.numPlayers === 1) ? ctx.currentPlayer : ctx.playOrder[ctx.playOrderPos - 1];
+        let previousPlayerIndex = ctx.playOrderPos === 0 ? ctx.numPlayers - 1 : ctx.playOrderPos - 1;
+        let previousPlayerID = (ctx.gameover || ctx.turn === 1 || ctx.numPlayers === 1) ? ctx.currentPlayer : ctx.playOrder[previousPlayerIndex];
         let moveList = G.players[previousPlayerID].moveList;
 
         // Stuck on tile, show info text
@@ -245,6 +247,7 @@ class GooseGameClient {
         if (ctx.gameover) {
             this.rollButton.disabled = true;
 
+            // TODO: add replay button?
             if (ctx.gameover.winner) {
                 this.confetti.render();
                 this.showInfoText(`${ctx.gameover.winner} won!`, -1);
@@ -321,4 +324,8 @@ class GooseGameClient {
 }
 
 const appElement = document.querySelector('.container');
-new GooseGameClient(appElement, { matchID: '', playerID: '0', credentials: '' });
+
+const matchID = sessionStorage.getItem('matchID');
+const playerID = sessionStorage.getItem('playerID');
+const playerCredentials = sessionStorage.getItem('playerCredentials');
+new GooseGameClient(appElement, { matchID: matchID, playerID: playerID, credentials: playerCredentials });
