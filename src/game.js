@@ -61,13 +61,18 @@ export const GooseGame = {
                 return;
             }
 
-            // Only throw dice if the player is not stuck, or if there is a chance that a dice throw frees the player
-            if (!G.players[ctx.currentPlayer].stuck || !TILE_EVENT_MAP[G.players[ctx.currentPlayer].tileNumber].endGameIfAllStuck) {
-                G.dice = ctx.random.D6(DICE_COUNT);
-                ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.dice}`);
-
-                G.rollDice = true;
+            // Check if the player is stuck, and has no chance of escaping
+            const tileNumber = G.players[ctx.currentPlayer].tileNumber;
+            if (G.players[ctx.currentPlayer].stuck && TILE_EVENT_MAP[tileNumber].endGameIfAllStuck && !TILE_EVENT_MAP[tileNumber].escapeCondition(G, ctx)) {
+                G.infoText = "Player is stuck, skipped turn.";
+                ctx.events.endTurn();
+                return;
             }
+
+            G.dice = ctx.random.D6(DICE_COUNT);
+            ctx.log.setMetadata(`Player ${ctx.currentPlayer} rolled ${G.dice}`);
+
+            G.rollDice = true;
         },
         updatePlayer: (G, ctx) => {
             const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
@@ -75,17 +80,13 @@ export const GooseGame = {
             G.rollDice = false;
 
             // Check if the player is stuck, free player if the escape condition is met
-            if (G.players[ctx.currentPlayer].stuck) {
-                if (!TILE_EVENT_MAP[G.players[ctx.currentPlayer].tileNumber].escapeCondition(G, ctx)) {
-
-                    G.infoText = "Player is stuck, skipped turn.";
-
-                    ctx.events.endTurn();
-                    return;
-                }
-
-                G.players[ctx.currentPlayer].stuck = false;
+            if (G.players[ctx.currentPlayer].stuck && !TILE_EVENT_MAP[G.players[ctx.currentPlayer].tileNumber].escapeCondition(G, ctx)) {
+                G.infoText = "Player is stuck, skipped turn.";
+                ctx.events.endTurn();
+                return;
             }
+
+            G.players[ctx.currentPlayer].stuck = false;
 
             const diceSum = G.dice.reduce((a, b) => a + b, 0);
             movePlayer(G, ctx, diceSum, 1);
@@ -104,7 +105,8 @@ export const GooseGame = {
         }
 
         // End if all players are stuck, resulting in a draw
-        if (Object.values(G.players).every((player) => player.stuck &&
+        if (Object.values(G.players).every((player) =>
+                player.stuck && !TILE_EVENT_MAP[player.tileNumber].escapeCondition(G, ctx) &&
                 TILE_EVENT_MAP[player.tileNumber].endGameIfAllStuck)) {
             return { winner: null };
         }
