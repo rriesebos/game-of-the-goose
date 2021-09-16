@@ -1,29 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./css/style.css" />
+        <link rel="stylesheet" href="./css/create.css" />
 
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/create.css">
+        <title>Game of the Goose</title>
+    </head>
 
-    <title>Game of the Goose</title>
-</head>
+    <body>
+        <div class="container">
+            <label for="rulesets">Choose a ruleset:</label>
+            <select id="ruleset-selector" name="rulesets"></select>
 
-<body>
-    <div class="container">
-        <label for="rulesets">Choose a ruleset:</label>
-        <select id="ruleset-selector" name="rulesets"></select>
+            <label for="num-players">Number of players (1-6):</label>
+            <input type="number" id="num-players" name="num-players" value="4" min="1" max="6" />
 
-        <label for="num-players">Number of players (1-6):</label>
-        <input type="number" id="num-players" name="num-players" value="4" min="1" max="6">
+            <button id="create-match-button" class="button">Create match</button>
+        </div>
 
-        <button id="create-match-button" class="button">Create match</button>
-    </div>
-
-    <script src="./src/create-game.js"></script>
-</body>
-
+        <script src="./src/create-game.js"></script>
+    </body>
 </html>
