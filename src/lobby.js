@@ -1,6 +1,6 @@
 import { LobbyClient } from 'boardgame.io/client';
 import { GooseGame } from './game';
-import { SERVER_URL } from './constants';
+import { SERVER_URL, PLAYER_IMAGE_MAP } from './constants';
 
 // TODO: lobby with list of player names and colors (goose images)
 // TODO: leave button, onbeforeunload (clear session storage, redirect?)
@@ -31,25 +31,28 @@ export class GooseGameLobby {
 
     async createLobby() {
         this.rootElement.innerHTML = `
-            <div id="player-list"></div>
-            <button id="start-match-button" class="button" disabled>Start match</button>
+            <div class="lobby-container">
+                <h1>Game of the Goose</h1>
+                <div id="player-list"></div>
+                <button id="start-match-button" class="button" disabled>Start match</button>
 
-            <div>
-                <h2>Copy the invite link:</h2>
-                <div class="copy-box">
-                    <input type="text" id="match-invite-link" class="copy-input" name="match-invite-link" readonly>
-                    <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" class="copy-icon" viewBox="0 0 24 24">
-                        <g>
-                            <path fill="none" d="M0 0h24v24H0V0z"></path>
-                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path>
-                        </g>
-                    </svg>
+                <div id="match-invite-box">
+                    <h2>Invite your friends:</h2>
+                    <div class="copy-box">
+                        <input type="text" id="match-invite-link" class="copy-input" name="match-invite-link" readonly>
+                        <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" class="copy-icon" viewBox="0 0 24 24">
+                            <g>
+                                <path fill="none" d="M0 0h24v24H0V0z"></path>
+                                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path>
+                            </g>
+                        </svg>
+                    </div>
                 </div>
             </div>
         `;
 
-        this.startMatchButton = this.rootElement.querySelector('#start-match-button');
         this.playerList = this.rootElement.querySelector('#player-list');
+        this.startMatchButton = this.rootElement.querySelector('#start-match-button');
         this.matchInviteLinkCopyBox = this.rootElement.querySelector('.copy-box');
         this.matchInviteLinkInput = document.querySelector('#match-invite-link');
 
@@ -84,6 +87,7 @@ export class GooseGameLobby {
         return openSpot.id.toString();
     }
 
+    // TODO: check if game has started
     async joinMatch(playerID) {
         // Check if the client has already joined
         if (this.client.playerID && this.client.playerID === this.playerID) {
@@ -140,12 +144,25 @@ export class GooseGameLobby {
 
         let playerListHTML = '';
         for (let i = 0; i < playerNames.length; i++) {
-            // TODO: add goose images
+            let playerName = playerNames[i];
+
+            // Make own name bold
             if (i.toString() === this.client.playerID) {
-                playerListHTML += `<div>${playerNames[i]} (You)</div>`;
-            } else {
-                playerListHTML += `<div>${playerNames[i]}</div>`;
+                playerName = `<b>${playerName}</b>`;
             }
+
+            // Add crown symbol to host
+            if (i === 0) {
+                playerName += ' ♕';
+            }
+
+            playerListHTML += `
+                <div class="player-info">
+                    <img class="player-info-goose" src=${PLAYER_IMAGE_MAP[i.toString()]}></img>
+                    <span>${playerName}</span>
+                </div>
+                <hr>
+            `;
         }
 
         this.playerList.innerHTML = playerListHTML;

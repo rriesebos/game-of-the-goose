@@ -2,28 +2,12 @@ import { Client } from 'boardgame.io/client';
 import { SocketIO } from 'boardgame.io/multiplayer'
 import { GooseGame } from './game';
 import { rulesets } from './rulesets';
-import { SERVER_URL } from './constants';
+import { SERVER_URL, PLAYER_IMAGE_MAP } from './constants';
 
 import { GooseGameLobby } from './lobby';
 
 import rollADie from './roll-a-die/roll-a-die';
 import ConfettiGenerator from 'confetti-js';
-
-import player0Img from '../img/player0.svg';
-import player1Img from '../img/player1.svg';
-import player2Img from '../img/player2.svg';
-import player3Img from '../img/player3.svg';
-import player4Img from '../img/player4.svg';
-import player5Img from '../img/player5.svg';
-
-const PLAYER_IMAGE_MAP = {
-    '0': player0Img,
-    '1': player1Img,
-    '2': player2Img,
-    '3': player3Img,
-    '4': player4Img,
-    '5': player5Img,
-}
 
 const INFO_TEXT_DURATION_SHORT = 2000;
 const INFO_TEXT_DURATION_LONG = 4000;
@@ -215,15 +199,12 @@ class GooseGameClient {
             tile.innerHTML = `<span>${tile.dataset.id}</span>`;
         });
 
-        const spacing = 11 / ctx.numPlayers;
-        let i = spacing / 2;
+        const spacing = 80 / ctx.numPlayers;
         for (const [id, player] of Object.entries(G.players)) {
             // Draw players that are stationary
             if (G.players[id].moveList.length === 0) {
-                this.drawPlayerPosition(i, player.tileNumber, id);
+                this.drawPlayerPosition(spacing, player.tileNumber, id);
             }
-
-            i += spacing;
         }
 
         let previousPlayerIndex = ctx.playOrderPos === 0 ? ctx.numPlayers - 1 : ctx.playOrderPos - 1;
@@ -232,6 +213,7 @@ class GooseGameClient {
 
         // Stuck on tile, show info text
         if (ctx.turn > 1 && moveList.length === 0) {
+            this.rollButton.disabled = true;
             await this.showInfoText(G.infoText, INFO_TEXT_DURATION_SHORT);
         }
 
@@ -276,9 +258,8 @@ class GooseGameClient {
             }
 
             // Add new player image
-            let spacing = 11 / ctx.numPlayers;
-            let topSpacing = spacing / 2 + parseInt(id) * spacing;
-            this.drawPlayerPosition(topSpacing, i, id);
+            const spacing = 80 / ctx.numPlayers;
+            this.drawPlayerPosition(spacing, i, id);
 
             const TILE_EVENT_MAP = rulesets[G.ruleset].TILE_EVENT_MAP;
             if (i in TILE_EVENT_MAP && TILE_EVENT_MAP[i].condition(G, ctx) &&
@@ -291,7 +272,7 @@ class GooseGameClient {
         }
     }
 
-    drawPlayerPosition(topSpacing, tile, id) {
+    drawPlayerPosition(spacing, tile, id) {
         const newTile = this.rootElement.querySelector(`[data-id='${tile}']`);
         if (newTile.querySelector('#player' + id)) {
             return;
@@ -303,7 +284,8 @@ class GooseGameClient {
         playerGoose.classList.add("goose");
         playerGoose.src = PLAYER_IMAGE_MAP[id];
 
-        playerGoose.style.top = `${topSpacing}vh`;
+        const topSpacing = (spacing - 20) / 2 + parseInt(id) * spacing;
+        playerGoose.style.top = `${topSpacing}%`;
 
         newTile.appendChild(playerGoose);
     }

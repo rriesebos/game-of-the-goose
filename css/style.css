@@ -3,15 +3,21 @@
     box-sizing: border-box;
 }
 
+html {
+    height: 100%;
+}
+
 body {
+    height: 100%;
     margin: 0;
     padding: 0;
     font-family: 'Quicksand', sans-serif;
     background-color: #b6efd48e;
+    line-height: 1.5;
 }
 
 .container {
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -24,7 +30,8 @@ body {
     align-self: center;
     display: inline-block;
     padding: 0.6rem 1.6rem;
-    margin-top: 1rem;
+    margin: 1rem;
+    margin-bottom: 0;
     border: 0.2em solid rgba(255, 255, 255, 0);
     border-radius: 0.6em;
     font-size: 1.5em;
@@ -35,6 +42,12 @@ body {
     transition: background-color 0.2s, color 0.2s;
     box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
     cursor: pointer;
+}
+
+@media screen and (min-device-width: 320px) and (max-device-width: 800px) and (-webkit-min-device-pixel-ratio: 2) {
+    .button {
+        font-size: 14px;
+    }
 }
 
 .button:hover {
@@ -58,6 +71,7 @@ label {
 }
 
 .copy-box {
+    max-width: 100%;
     display: flex;
     justify-content: space-between;
     height: 32px;
@@ -68,7 +82,7 @@ label {
 }
 
 .copy-box>.copy-input {
-    width: 80ch;
+    width: 100%;
     padding: 4px 12px;
     font-family: monospace;
     font-weight: 600;
