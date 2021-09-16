@@ -25,7 +25,5 @@ async function createMatch() {
         setupData: { ruleset: rulesetSelector.value }
     });
 
-    console.log(match);
-
     window.location.href = `/game.html?matchID=${match.matchID}`;
 }
