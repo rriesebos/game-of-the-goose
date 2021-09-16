@@ -3,19 +3,24 @@
     --board-rotation: 55deg;
 }
 
+.container {
+    margin: 0 2em;
+}
+
+/* Lobby */
+
 .lobby-container {
-    width: max(50%, 30ch);
+    height: 100%;
+    max-width: 100%;
+    width: max(50%, 80ch);
     margin: 2em 0;
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
 }
 
-.lobby-container > h1 {
+.lobby-container > h2 {
     align-self: center;
-}
-
-#player-list {
-    margin: 1em 0;
 }
 
 .player-info {
@@ -23,7 +28,11 @@
     justify-content: flex-start;
     align-items: center;
     max-width: 100%;
-    padding: 0.4em;
+    padding: 0.2em;
+}
+
+#player-list > hr {
+    margin: 0;
 }
 
 .player-info > span {
@@ -43,6 +52,8 @@
     margin-right: 0;
 }
 
+/* Game */
+
 #info-container {
     z-index: 4;
     opacity: 0;
@@ -50,7 +61,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    max-width: 40rem;
+    max-width: 32ch;
     top: 20rem;
     padding: 1rem 2rem;
     margin: 0 20%;
@@ -87,7 +98,7 @@
     row-gap: 10px;
     column-gap: 8px;
     padding: 20px;
-    margin: 0 10%;
+    margin: -2% 11%;
     background: #ffde82;
     border: 12px solid #8e6e53;
     border-radius: 2%;
@@ -140,6 +151,7 @@
 .goose {
     z-index: 1;
     position: absolute;
+    inset: 0;
     width: 100%;
     min-width: 30px;
     transform: perspective(2000px) rotateX(-75deg) translateY(-50%) translateX(5px);
@@ -220,4 +232,113 @@
 #tile52 > .goose,
 #tile53 > .goose {
     transform: scaleX(-1) perspective(2000px) rotateX(-70deg) translateY(-50%);
+}
+
+@media screen and (min-device-width: 320px) and (max-device-width: 750px) {
+    .container {
+        justify-content: space-evenly;
+    }
+
+    /* Lobby */
+
+    #player-list {
+        margin: 0;
+    }
+
+    .player-info > span {
+        font-size: 1em;
+    }
+
+    .player-info-goose {
+        width: 2rem;
+    }
+
+    /* Game */
+
+    #roll-button {
+        top: 0;
+        margin: 0;
+        padding: 0.6rem 2.5rem;
+    }
+
+    #info-container {
+        top: 50%;
+        font-size: 14px;
+        padding: 0.6em 0.8em;
+    }
+
+    .board {
+        flex-grow: 0;
+        transform: none;
+    }
+
+    .goose {
+        transform: none;
+        translate: 0 -50%;
+    }
+
+    .tile > span {
+        width: 100%;
+        padding: 2px;
+        font-size: 8px;
+        box-shadow: none;
+    }
+
+    #tile11 > .goose,
+    #tile12 > .goose,
+    #tile13 > .goose,
+    #tile14 > .goose,
+    #tile15 > .goose,
+    #tile11 > .goose,
+    #tile12 > .goose,
+    #tile13 > .goose,
+    #tile14 > .goose,
+    #tile15 > .goose,
+    #tile16 > .goose,
+    #tile17 > .goose,
+    #tile18 > .goose,
+    #tile19 > .goose,
+    #tile20 > .goose,
+    #tile21 > .goose,
+    #tile22 > .goose,
+    #tile23 > .goose,
+    #tile24 > .goose,
+    #tile25 > .goose,
+    #tile26 > .goose,
+    #tile27 > .goose,
+    #tile41 > .goose,
+    #tile42 > .goose,
+    #tile43 > .goose,
+    #tile44 > .goose,
+    #tile45 > .goose,
+    #tile46 > .goose,
+    #tile47 > .goose,
+    #tile48 > .goose,
+    #tile49 > .goose,
+    #tile50 > .goose,
+    #tile51 > .goose,
+    #tile52 > .goose,
+    #tile53 > .goose {
+        transform: scaleX(-1);
+    }
+}
+
+@media screen and (min-device-width: 320px) and (max-device-width: 750px) and (orientation: landscape) {
+    #player-list {
+        height: 150px;
+        overflow: scroll;
+    }
+}
+
+@media screen and (min-device-width: 320px) and (max-device-width: 750px) and (orientation: portrait) {
+    .container {
+        padding: 0;
+    }
+
+    .board {
+        width: 140%;
+        rotate: 90deg;
+        margin: 0;
+        translate: -14% -6%;
+    }
 }

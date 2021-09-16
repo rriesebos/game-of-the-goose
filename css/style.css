@@ -1,5 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
 
+:root {
+    --button-color: hsl(0deg 85% 63%);
+    --button-shadow-color: hsl(0deg 30% 63% / 0.4);
+}
+
 * {
     box-sizing: border-box;
 }
@@ -19,15 +24,17 @@ body {
 
 .container {
     height: 100%;
+    margin: 0 10%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 2em;
 }
 
 .button {
     position: relative;
-    background-color: #f14e4e;
+    background-color: var(--button-color);
     align-self: center;
     display: inline-block;
     padding: 0.6rem 1.6rem;
@@ -37,27 +44,22 @@ body {
     border-radius: 0.6em;
     font-size: 1.5em;
     color: white;
-    text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
+    text-shadow: 0.04em 0.04em 0.04em rgba(0, 0, 0, 0.35);
     text-align: center;
     text-decoration: none;
     transition: background-color 0.2s, color 0.2s;
-    box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 0.075), 2px 2px 2px hsl(0deg 0% 0% / 0.075),
-        4px 4px 4px hsl(0deg 0% 0% / 0.075), 8px 8px 8px hsl(0deg 0% 0% / 0.02);
+    box-shadow: 1px 1px 1px var(--button-shadow-color), 2px 2px 2px var(--button-shadow-color),
+        4px 4px 4px var(--button-shadow-color), 5px 5px 5px var(--button-shadow-color);
     cursor: pointer;
 }
 
-@media screen and (min-device-width: 320px) and (max-device-width: 800px) and (-webkit-min-device-pixel-ratio: 2) {
-    .button {
-        font-size: 14px;
-    }
-}
-
 .button:hover {
-    border-color: rgba(255, 255, 255, 1);
+    border-color: white;
 }
 
 .button:enabled:active {
     transform: translateY(0.2rem);
+    box-shadow: 1px 1px 1px var(--button-shadow-color), 2px 2px 2px var(--button-shadow-color);
 }
 
 .button:disabled {
@@ -65,17 +67,64 @@ body {
     border-color: #ccc;
     color: #666;
     cursor: auto;
+    box-shadow: none;
+}
+
+h1,
+h2 {
+    margin: 0;
+    text-shadow: 0.01em 0.01em 0.01em rgba(0, 0, 0, 0.2), 0.02em 0.02em 0.02em rgba(0, 0, 0, 0.2),
+        0.04em 0.04em 0.04em rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    font-size: 4em;
+    margin-bottom: 1em;
+}
+
+h2 {
+    font-size: 3em;
+    margin-bottom: 0.75em;
+}
+
+h3 {
+    font-size: 2em;
+    margin-bottom: 0.5em;
 }
 
 label {
     display: block;
     margin-bottom: 0.5em;
+    font-size: 1.4em;
+}
+
+input,
+select {
+    width: 100%;
+    font-size: 1.2em;
+    margin-bottom: 0.8em;
+}
+
+select {
+    padding: 0.2em;
+}
+
+.input-section {
+    max-width: 100%;
+    width: 500px;
+    padding: 2em 4em;
+    background: #b6efd4ef;
+    border: 1px solid black;
+    border-radius: 0.5em;
+    box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 0.075), 2px 2px 2px hsl(0deg 0% 0% / 0.075),
+        4px 4px 4px hsl(0deg 0% 0% / 0.075), 8px 8px 8px hsl(0deg 0% 0% / 0.06);
 }
 
 .copy-box {
     max-width: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     height: 32px;
     cursor: pointer;
     background-color: #058c42;
@@ -84,6 +133,7 @@ label {
 }
 
 .copy-box > .copy-input {
+    margin: 0;
     width: 100%;
     padding: 4px 12px;
     font-family: monospace;
@@ -105,4 +155,47 @@ label {
     height: 24px;
     margin-right: 8px;
     fill: white;
+}
+
+@media screen and (min-device-width: 320px) and (max-device-width: 750px) {
+    .container {
+        justify-content: space-evenly;
+        padding: 1em 0;
+    }
+
+    .button {
+        font-size: 14px;
+    }
+
+    h1,
+    h2,
+    h3 {
+        margin: 0;
+    }
+
+    h1,
+    h2 {
+        font-size: 2em;
+    }
+
+    h3 {
+        font-size: 1.5em;
+        margin-bottom: 0.5em;
+    }
+
+    label {
+        margin-bottom: 0.2em;
+        font-size: 1em;
+    }
+
+    input,
+    select {
+        width: 100%;
+        font-size: 0.8em;
+        margin-bottom: 0.8em;
+    }
+
+    .input-section {
+        padding: 1em;
+    }
 }

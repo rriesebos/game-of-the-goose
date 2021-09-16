@@ -30,12 +30,12 @@ export class GooseGameLobby {
     async createLobby() {
         this.rootElement.innerHTML = `
             <div class="lobby-container">
-                <h1>Game of the Goose</h1>
+                <h2>Game of the Goose</h2>
                 <div id="player-list"></div>
                 <button id="start-match-button" class="button" disabled>Start match</button>
 
                 <div id="match-invite-box">
-                    <h2>Invite your friends:</h2>
+                    <h3>Invite your friends:</h3>
                     <div class="copy-box">
                         <input type="text" id="match-invite-link" class="copy-input" name="match-invite-link" readonly>
                         <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" class="copy-icon" viewBox="0 0 24 24">
