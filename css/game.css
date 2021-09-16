@@ -19,8 +19,14 @@
     justify-content: space-evenly;
 }
 
-.lobby-container > h2 {
+#title-container {
+    margin-bottom: 1em;
     align-self: center;
+    text-align: center;
+}
+
+#title-container > h2 {
+    margin: 0;
 }
 
 .player-info {
@@ -47,9 +53,16 @@
     width: 4rem;
 }
 
-#start-match-button {
+#start-container {
     align-self: flex-end;
-    margin-right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#start-container > button {
+    margin: 0;
+    margin-top: 0.2em;
 }
 
 /* Game */
@@ -251,6 +264,10 @@
 
     .player-info-goose {
         width: 2rem;
+    }
+
+    #start-container {
+        font-size: 12px;
     }
 
     /* Game */

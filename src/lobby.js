@@ -3,7 +3,6 @@ import { GooseGame } from "./game";
 import { SERVER_URL, PLAYER_IMAGE_MAP } from "./constants";
 
 // TODO: leave button, onbeforeunload (clear session storage, redirect?)
-// TODO: add player count indicator, disable start when room is not full?
 
 export class GooseGameLobby {
     constructor(rootElement, client) {
@@ -30,9 +29,16 @@ export class GooseGameLobby {
     async createLobby() {
         this.rootElement.innerHTML = `
             <div class="lobby-container">
-                <h2>Game of the Goose</h2>
+                <div id="title-container">
+                    <h2>Game of the Goose</h2>
+                    <span id="room-info"></span>
+                </div>
                 <div id="player-list"></div>
-                <button id="start-match-button" class="button" disabled>Start match</button>
+
+                <div id="start-container">
+                    <span id="player-count"></span>
+                    <button id="start-match-button" class="button" disabled>Start match</button>
+                </div>
 
                 <div id="match-invite-box">
                     <h3>Invite your friends:</h3>
@@ -49,6 +55,9 @@ export class GooseGameLobby {
             </div>
         `;
 
+        this.roomInfoContainer = this.rootElement.querySelector("#room-info");
+        this.playerCountText = this.rootElement.querySelector("#player-count");
+
         this.playerList = this.rootElement.querySelector("#player-list");
         this.startMatchButton = this.rootElement.querySelector("#start-match-button");
         this.matchInviteLinkCopyBox = this.rootElement.querySelector(".copy-box");
@@ -60,9 +69,6 @@ export class GooseGameLobby {
         // Update match invite link
         // TODO: update url
         this.matchInviteLinkInput.value = `localhost:1234/index.html?matchID=${this.matchID}`;
-
-        // Enable start button if the player is the first player (game creator if no one leaves)
-        this.startMatchButton.disabled = this.client.playerID !== "0";
     }
 
     getMatch(matchID) {
@@ -160,6 +166,18 @@ export class GooseGameLobby {
         }
 
         this.playerList.innerHTML = playerListHTML;
+
+        this.updateRoomInfo(this.playerNames.length);
+    }
+
+    async updateRoomInfo(playerCount) {
+        const match = await this.getMatch(this.matchID);
+
+        this.roomInfoContainer.innerText = `Ruleset: ${match.setupData.ruleset} — Players: ${match.players.length}`;
+        this.playerCountText.innerText = `Joined players:  ${playerCount} / ${match.players.length}`;
+
+        // Enable start button if the player is the first player (game creator if no one leaves) and the room is full
+        this.startMatchButton.disabled = this.client.playerID !== "0" || playerCount !== match.players.length;
     }
 
     startMatch() {
