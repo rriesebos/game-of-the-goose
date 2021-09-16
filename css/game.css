@@ -10,7 +10,7 @@
     flex-direction: column;
 }
 
-.lobby-container>h1 {
+.lobby-container > h1 {
     align-self: center;
 }
 
@@ -23,10 +23,10 @@
     justify-content: flex-start;
     align-items: center;
     max-width: 100%;
-    padding: .4em;
+    padding: 0.4em;
 }
 
-.player-info>span {
+.player-info > span {
     font-size: 1.5em;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -89,11 +89,12 @@
     padding: 20px;
     margin: 0 10%;
     background: #ffde82;
-    border: 12px solid #8E6E53;
+    border: 12px solid #8e6e53;
     border-radius: 2%;
     transform-style: preserve-3d;
     transform: perspective(2000px) rotateX(var(--board-rotation));
-    box-shadow: 4px 6px 4px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 0.075), 2px 2px 2px hsl(0deg 0% 0% / 0.075),
+        4px 4px 4px hsl(0deg 0% 0% / 0.075), 8px 8px 8px hsl(0deg 0% 0% / 0.075), 16px 16px 16px hsl(0deg 0% 0% / 0.075);
 }
 
 #space {
@@ -115,7 +116,7 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 4px;
-    background: #058C42;
+    background: #058c42;
     color: black;
     border: 1px solid black;
     font-size: max(1.3vw, 1.3vh);
@@ -123,7 +124,7 @@
     transform-style: preserve-3d;
 }
 
-.tile>span {
+.tile > span {
     text-align: center;
     width: fit-content;
     padding: 4px;
@@ -145,7 +146,7 @@
 }
 
 .tile.special {
-    background: #E23742;
+    background: #e23742;
 }
 
 #tile0 {
@@ -176,48 +177,47 @@
     border-radius: 0 0 0 var(--tile-curve);
 }
 
-#tile31>span,
-#tile55>span {
+#tile31 > span,
+#tile55 > span {
     align-self: flex-end;
 }
 
-
 /* Rotate player image to the left */
 
-#tile11>.goose,
-#tile12>.goose,
-#tile13>.goose,
-#tile14>.goose,
-#tile15>.goose,
-#tile11>.goose,
-#tile12>.goose,
-#tile13>.goose,
-#tile14>.goose,
-#tile15>.goose,
-#tile16>.goose,
-#tile17>.goose,
-#tile18>.goose,
-#tile19>.goose,
-#tile20>.goose,
-#tile21>.goose,
-#tile22>.goose,
-#tile23>.goose,
-#tile24>.goose,
-#tile25>.goose,
-#tile26>.goose,
-#tile27>.goose,
-#tile41>.goose,
-#tile42>.goose,
-#tile43>.goose,
-#tile44>.goose,
-#tile45>.goose,
-#tile46>.goose,
-#tile47>.goose,
-#tile48>.goose,
-#tile49>.goose,
-#tile50>.goose,
-#tile51>.goose,
-#tile52>.goose,
-#tile53>.goose {
+#tile11 > .goose,
+#tile12 > .goose,
+#tile13 > .goose,
+#tile14 > .goose,
+#tile15 > .goose,
+#tile11 > .goose,
+#tile12 > .goose,
+#tile13 > .goose,
+#tile14 > .goose,
+#tile15 > .goose,
+#tile16 > .goose,
+#tile17 > .goose,
+#tile18 > .goose,
+#tile19 > .goose,
+#tile20 > .goose,
+#tile21 > .goose,
+#tile22 > .goose,
+#tile23 > .goose,
+#tile24 > .goose,
+#tile25 > .goose,
+#tile26 > .goose,
+#tile27 > .goose,
+#tile41 > .goose,
+#tile42 > .goose,
+#tile43 > .goose,
+#tile44 > .goose,
+#tile45 > .goose,
+#tile46 > .goose,
+#tile47 > .goose,
+#tile48 > .goose,
+#tile49 > .goose,
+#tile50 > .goose,
+#tile51 > .goose,
+#tile52 > .goose,
+#tile53 > .goose {
     transform: scaleX(-1) perspective(2000px) rotateX(-70deg) translateY(-50%);
 }

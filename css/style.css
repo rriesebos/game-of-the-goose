@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
+
 * {
     box-sizing: border-box;
 }
@@ -11,7 +12,7 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
     background-color: #b6efd48e;
     line-height: 1.5;
 }
@@ -40,7 +41,8 @@ body {
     text-align: center;
     text-decoration: none;
     transition: background-color 0.2s, color 0.2s;
-    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 0.075), 2px 2px 2px hsl(0deg 0% 0% / 0.075),
+        4px 4px 4px hsl(0deg 0% 0% / 0.075), 8px 8px 8px hsl(0deg 0% 0% / 0.02);
     cursor: pointer;
 }
 
@@ -76,12 +78,12 @@ label {
     justify-content: space-between;
     height: 32px;
     cursor: pointer;
-    background-color: #058C42;
+    background-color: #058c42;
     border-radius: 2px;
     font-size: 14px;
 }
 
-.copy-box>.copy-input {
+.copy-box > .copy-input {
     width: 100%;
     padding: 4px 12px;
     font-family: monospace;
@@ -96,7 +98,7 @@ label {
     outline: none;
 }
 
-.copy-box>.copy-icon {
+.copy-box > .copy-icon {
     position: relative;
     align-self: center;
     width: 24px;
