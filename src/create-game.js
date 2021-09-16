@@ -1,16 +1,16 @@
-import { rulesets } from './rulesets';
-import { LobbyClient } from 'boardgame.io/client';
-import { GooseGame } from './game';
-import { SERVER_URL } from './constants';
+import { rulesets } from "./rulesets";
+import { LobbyClient } from "boardgame.io/client";
+import { GooseGame } from "./game";
+import { SERVER_URL } from "./constants";
 
-const rulesetSelector = document.querySelector('#ruleset-selector');
-const numPlayersInput = document.querySelector('#num-players');
+const rulesetSelector = document.querySelector("#ruleset-selector");
+const numPlayersInput = document.querySelector("#num-players");
 
-const createMatchButton = document.querySelector('#create-match-button');
+const createMatchButton = document.querySelector("#create-match-button");
 
-let rulesetOptions = '';
+let rulesetOptions = "";
 for (const ruleset of Object.keys(rulesets)) {
-    rulesetOptions += `<option value="${ruleset}">${ruleset}</option>\n`
+    rulesetOptions += `<option value="${ruleset}">${ruleset}</option>\n`;
 }
 
 rulesetSelector.innerHTML = rulesetOptions;
@@ -22,7 +22,7 @@ async function createMatch() {
 
     const match = await lobbyClient.createMatch(GooseGame.name, {
         numPlayers: parseInt(numPlayersInput.value),
-        setupData: { ruleset: rulesetSelector.value }
+        setupData: { ruleset: rulesetSelector.value },
     });
 
     window.location.href = `/game.html?matchID=${match.matchID}`;

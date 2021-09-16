@@ -1,10 +1,8 @@
-import { LobbyClient } from 'boardgame.io/client';
-import { GooseGame } from './game';
-import { SERVER_URL, PLAYER_IMAGE_MAP } from './constants';
+import { LobbyClient } from "boardgame.io/client";
+import { GooseGame } from "./game";
+import { SERVER_URL, PLAYER_IMAGE_MAP } from "./constants";
 
-// TODO: lobby with list of player names and colors (goose images)
 // TODO: leave button, onbeforeunload (clear session storage, redirect?)
-// TODO: Lobby owner indicator
 // TODO: add player count indicator, disable start when room is not full?
 
 export class GooseGameLobby {
@@ -14,12 +12,12 @@ export class GooseGameLobby {
         this.rootElement = rootElement;
         this.client = client;
 
-        const params = (new URL(document.location)).searchParams;
-        this.matchID = params.get('matchID');
+        const params = new URL(document.location).searchParams;
+        this.matchID = params.get("matchID");
 
         // Retrieve player information from session storage
-        this.playerID = sessionStorage.getItem('playerID');
-        this.playerName = sessionStorage.getItem('playerName');
+        this.playerID = sessionStorage.getItem("playerID");
+        this.playerName = sessionStorage.getItem("playerName");
 
         this.validateMatch(this.matchID)
             .then((playerID) => {
@@ -51,10 +49,10 @@ export class GooseGameLobby {
             </div>
         `;
 
-        this.playerList = this.rootElement.querySelector('#player-list');
-        this.startMatchButton = this.rootElement.querySelector('#start-match-button');
-        this.matchInviteLinkCopyBox = this.rootElement.querySelector('.copy-box');
-        this.matchInviteLinkInput = document.querySelector('#match-invite-link');
+        this.playerList = this.rootElement.querySelector("#player-list");
+        this.startMatchButton = this.rootElement.querySelector("#start-match-button");
+        this.matchInviteLinkCopyBox = this.rootElement.querySelector(".copy-box");
+        this.matchInviteLinkInput = document.querySelector("#match-invite-link");
 
         this.startMatchButton.onclick = () => this.startMatch();
         this.matchInviteLinkCopyBox.onclick = () => this.copyMatchInvite();
@@ -64,11 +62,11 @@ export class GooseGameLobby {
         this.matchInviteLinkInput.value = `localhost:1234/index.html?matchID=${this.matchID}`;
 
         // Enable start button if the player is the first player (game creator if no one leaves)
-        this.startMatchButton.disabled = this.client.playerID !== '0';
+        this.startMatchButton.disabled = this.client.playerID !== "0";
     }
 
     getMatch(matchID) {
-        return this.lobbyClient.getMatch(GooseGame.name, matchID)
+        return this.lobbyClient.getMatch(GooseGame.name, matchID);
     }
 
     async getPlayerId(matchID) {
@@ -87,7 +85,6 @@ export class GooseGameLobby {
         return openSpot.id.toString();
     }
 
-    // TODO: check if game has started
     async joinMatch(playerID) {
         // Check if the client has already joined
         if (this.client.playerID && this.client.playerID === this.playerID) {
@@ -95,24 +92,21 @@ export class GooseGameLobby {
         }
 
         // Enable start button if the player is the first player (game creator if no one leaves)
-        this.startMatchButton.disabled = playerID !== '0';
+        this.startMatchButton.disabled = playerID !== "0";
 
-        const { playerCredentials } = await this.lobbyClient.joinMatch(
-            GooseGame.name,
-            this.matchID, {
-                playerID: playerID,
-                playerName: !this.playerName || this.playerName === '' ? "Player " + playerID : this.playerName,
-            }
-        );
+        const { playerCredentials } = await this.lobbyClient.joinMatch(GooseGame.name, this.matchID, {
+            playerID: playerID,
+            playerName: !this.playerName || this.playerName === "" ? "Player " + playerID : this.playerName,
+        });
 
         this.client.updateMatchID(this.matchID);
         this.client.updatePlayerID(playerID);
         this.client.updateCredentials(playerCredentials);
 
         // Store current session variables
-        sessionStorage.setItem('matchID', this.matchID);
-        sessionStorage.setItem('playerID', playerID);
-        sessionStorage.setItem('playerCredentials', playerCredentials);
+        sessionStorage.setItem("matchID", this.matchID);
+        sessionStorage.setItem("playerID", playerID);
+        sessionStorage.setItem("playerCredentials", playerCredentials);
     }
 
     async validateMatch(matchID) {
@@ -122,18 +116,18 @@ export class GooseGameLobby {
 
         // Redirect to index.html if match id is not set
         if (!matchID) {
-            throw 'Match ID not set.';
+            throw "Match ID not set.";
         }
 
         let playerID = -1;
         try {
             playerID = await this.getPlayerId(matchID);
         } catch (err) {
-            throw 'Invalid match ID.';
+            throw "Invalid match ID.";
         }
 
         if (playerID === -1) {
-            throw 'Match is full.';
+            throw "Match is full.";
         }
 
         return playerID;
@@ -142,7 +136,7 @@ export class GooseGameLobby {
     updatePlayers(playerNames) {
         this.playerNames = playerNames;
 
-        let playerListHTML = '';
+        let playerListHTML = "";
         for (let i = 0; i < playerNames.length; i++) {
             let playerName = playerNames[i];
 
@@ -153,7 +147,7 @@ export class GooseGameLobby {
 
             // Add crown symbol to host
             if (i === 0) {
-                playerName += ' ♕';
+                playerName += " ♕";
             }
 
             playerListHTML += `
@@ -184,7 +178,7 @@ export class GooseGameLobby {
     }
 
     showError(errorMessage) {
-        this.rootElement.innerHTML = '';
+        this.rootElement.innerHTML = "";
         this.rootElement.innerText = errorMessage;
         this.rootElement.innerHTML += `<button class="button" onclick="window.location.href = '/index.html'">Back to home</button>`;
     }
