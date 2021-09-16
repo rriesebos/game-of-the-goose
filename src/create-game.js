@@ -10,7 +10,7 @@ const createMatchButton = document.querySelector("#create-match-button");
 
 let rulesetOptions = "";
 for (const ruleset of Object.keys(rulesets)) {
-    rulesetOptions += `<option value="${ruleset}">${ruleset}</option>\n`;
+    rulesetOptions += `<option value="${ruleset}">${ruleset.charAt(0).toUpperCase() + ruleset.slice(1)}</option>\n`;
 }
 
 rulesetSelector.innerHTML = rulesetOptions;
