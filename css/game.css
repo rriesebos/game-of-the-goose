@@ -138,6 +138,7 @@
 #roll-button {
     top: 10%;
     padding: 0.6rem 2.5rem;
+    font-size: var(--font-size-medium);
 }
 
 .board {
@@ -319,7 +320,6 @@
     }
 
     #info-container {
-        font-size: 14px;
         padding: 0.6em 0.8em;
     }
 
