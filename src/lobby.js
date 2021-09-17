@@ -31,7 +31,7 @@ export class GooseGameLobby {
                     <h2>Game of the Goose</h2>
                     <span id="room-info"></span>
                 </div>
-                <div id="player-list"></div>
+                <div id="player-list-lobby"></div>
 
                 <div id="start-container">
                     <span id="player-count"></span>
@@ -56,7 +56,7 @@ export class GooseGameLobby {
         this.roomInfoContainer = this.rootElement.querySelector("#room-info");
         this.playerCountText = this.rootElement.querySelector("#player-count");
 
-        this.playerList = this.rootElement.querySelector("#player-list");
+        this.playerList = this.rootElement.querySelector("#player-list-lobby");
         this.startMatchButton = this.rootElement.querySelector("#start-match-button");
         this.matchInviteLinkCopyBox = this.rootElement.querySelector(".copy-box");
         this.matchInviteLinkInput = document.querySelector("#match-invite-link");

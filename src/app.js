@@ -33,7 +33,6 @@ class GooseGameClient {
 
         this.lastTurn = 0;
         this.rollingDice = false;
-        this.playerNames = {};
         this.boardVisible = false;
 
         // Create lobby if the game has not yet started
@@ -51,10 +50,13 @@ class GooseGameClient {
         this.boardVisible = true;
 
         this.rootElement.innerHTML = `
-                <div id="info-container"></div>
-                <canvas id="confetti-canvas"></canvas>
-                <button id="roll-button" class="button" disabled><span>Roll</span></button>
-                <div class="board">
+            <div id="player-list-game"></div>
+
+            <div id="info-container"></div>
+            <canvas id="confetti-canvas"></canvas>
+            <button id="roll-button" class="button" disabled><span>Roll</span></button>
+            
+            <div class="board">
                 <div id="tile0" data-id="0" class="tile special"><span>0</span></div>
                 <div id="tile1" data-id="1" class="tile"><span>1</span></div>
                 <div id="tile2" data-id="2" class="tile"><span>2</span></div>
@@ -129,6 +131,25 @@ class GooseGameClient {
             moveAgainTile.classList.add("move-again");
         }
 
+        // TODO: add event tile images
+
+        const playerListContainer = this.rootElement.querySelector("#player-list-game");
+        for (const player of this.client.matchData) {
+            const span = document.createElement("span");
+            span.classList.add("player-name");
+            span.innerText = player.name;
+
+            if (player.id.toString() === this.client.playerID) {
+                span.style.fontWeight = "bold";
+            }
+
+            span.dataset.playerId = player.id;
+
+            playerListContainer.appendChild(span);
+        }
+
+        // TODO: add turn counter
+
         this.infoContainer = this.rootElement.querySelector("#info-container");
         this.rollButton = this.rootElement.querySelector("#roll-button");
         this.spaceElement = this.rootElement.querySelector("#space");
@@ -147,16 +168,15 @@ class GooseGameClient {
     }
 
     updatePlayerNames() {
+        const playerNames = {};
         for (const player of this.client.matchData) {
             if (player.name && player.isConnected) {
-                this.playerNames[player.id.toString()] = player.name;
-            } else {
-                delete this.playerNames[player.id.toString()];
+                playerNames[player.id.toString()] = player.name;
             }
         }
 
         if (this.lobby) {
-            this.lobby.updatePlayers(Object.values(this.playerNames));
+            this.lobby.updatePlayers(Object.values(playerNames));
         }
     }
 
@@ -234,6 +254,19 @@ class GooseGameClient {
         for (let [from, to] of moveList) {
             let duration = Math.round(Math.min(500, 1000 / Math.abs(from - to)));
             await this.animatePlayer(G, ctx, previousPlayerID, from, to, duration);
+        }
+
+        for (let i = 0; i < ctx.numPlayers; i++) {
+            const id = i.toString();
+
+            // Clear player turn indicator
+            const currentPlayerText = this.rootElement.querySelector(`[data-player-id='${id}']`);
+            currentPlayerText.classList.remove("player-selected");
+
+            // Add player turn indicator
+            if (id === ctx.currentPlayer) {
+                currentPlayerText.classList.add("player-selected");
+            }
         }
 
         // Enable roll button for current player

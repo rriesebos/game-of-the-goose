@@ -4,7 +4,7 @@
 }
 
 .container {
-    margin: 0 2em;
+    margin: 0;
 }
 
 /* Lobby */
@@ -14,6 +14,7 @@
     max-width: 100%;
     width: max(50%, 80ch);
     margin: 2em 0;
+    padding: 0 1em;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -37,7 +38,7 @@
     padding: 0.2em;
 }
 
-#player-list > hr {
+#player-list-lobby > hr {
     margin: 0;
 }
 
@@ -67,6 +68,30 @@
 
 /* Game */
 
+#player-list-game {
+    width: 20ch;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    font-size: 24px;
+}
+
+#player-list-game > .player-name {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-left: 32px;
+}
+
+.player-selected::before {
+    content: "➤";
+    color: red;
+    margin-left: -32px;
+    margin-right: 8px;
+}
+
 #info-container {
     z-index: 4;
     opacity: 0;
@@ -75,7 +100,7 @@
     justify-content: center;
     align-items: center;
     max-width: 32ch;
-    top: 20rem;
+    top: 40%;
     padding: 1rem 2rem;
     margin: 0 20%;
     align-self: center;
@@ -249,12 +274,13 @@
 
 @media screen and (min-device-width: 320px) and (max-device-width: 750px) {
     .container {
+        margin: 0 1.5em;
         justify-content: space-evenly;
     }
 
     /* Lobby */
 
-    #player-list {
+    #player-list-lobby {
         margin: 0;
     }
 
@@ -279,7 +305,6 @@
     }
 
     #info-container {
-        top: 50%;
         font-size: 14px;
         padding: 0.6em 0.8em;
     }
@@ -287,6 +312,7 @@
     .board {
         flex-grow: 0;
         transform: none;
+        overflow-x: scroll;
     }
 
     .goose {
@@ -340,22 +366,63 @@
     }
 }
 
-@media screen and (min-device-width: 320px) and (max-device-width: 750px) and (orientation: landscape) {
-    #player-list {
-        height: 150px;
-        overflow: scroll;
+@media screen and (max-device-height: 720px) {
+    #player-list-game {
+        font-size: 16px;
+    }
+
+    #player-list-game > .player-name {
+        padding-left: 20px;
+    }
+
+    .player-selected::before {
+        margin-left: -20px;
+        margin-right: 4px;
     }
 }
 
-@media screen and (min-device-width: 320px) and (max-device-width: 750px) and (orientation: portrait) {
-    .container {
-        padding: 0;
+@media screen and (max-device-height: 440px) {
+    #player-list-game {
+        width: 10ch;
+        top: 10px;
+        left: 10px;
+        font-size: 12px;
+    }
+
+    #player-list-game > .player-name {
+        padding-left: 16px;
+    }
+
+    .player-selected::before {
+        margin-left: -16px;
+        margin-right: 4px;
+    }
+}
+
+@media screen and (max-device-width: 600px) {
+    #player-list-lobby {
+        height: 150px;
+        overflow: scroll;
+    }
+
+    #player-list-game {
+        position: relative;
+        inset: 0;
+        font-size: 16px;
+    }
+
+    #player-list-game > .player-name {
+        padding-left: 20px;
+    }
+
+    .player-selected::before {
+        content: "➤";
+        color: red;
+        margin-left: -20px;
+        margin-right: 4px;
     }
 
     .board {
-        width: 140%;
-        rotate: 90deg;
         margin: 0;
-        translate: -14% -6%;
     }
 }
