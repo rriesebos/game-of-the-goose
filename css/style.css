@@ -157,7 +157,7 @@ select {
     fill: white;
 }
 
-@media screen and (min-device-width: 320px) and (max-device-width: 750px) {
+@media screen and (min-device-width: 320px) and (max-device-width: 820px) {
     .container {
         justify-content: space-evenly;
         padding: 1em 0;

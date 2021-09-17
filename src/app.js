@@ -51,6 +51,7 @@ class GooseGameClient {
 
         this.rootElement.innerHTML = `
             <div id="player-list-game"></div>
+            <span id="turn-counter">Turn: 1</span>
 
             <div id="info-container"></div>
             <canvas id="confetti-canvas"></canvas>
@@ -148,7 +149,7 @@ class GooseGameClient {
             playerListContainer.appendChild(span);
         }
 
-        // TODO: add turn counter
+        this.turnCounter = this.rootElement.querySelector("#turn-counter");
 
         this.infoContainer = this.rootElement.querySelector("#info-container");
         this.rollButton = this.rootElement.querySelector("#roll-button");
@@ -222,6 +223,9 @@ class GooseGameClient {
         if (ctx.turn <= this.lastTurn && !ctx.gameover) {
             return;
         }
+
+        // Update turn counter
+        this.turnCounter.innerText = `Turn: ${ctx.turn}`;
 
         // Clear all tiles
         const tiles = this.rootElement.querySelectorAll(".tile");

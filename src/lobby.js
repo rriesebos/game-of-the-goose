@@ -163,7 +163,7 @@ export class GooseGameLobby {
 
             playerListHTML += `
                 <div class="player-info">
-                    <img class="player-info-goose" src=${PLAYER_IMAGE_MAP[i.toString()]}></img>
+                    <img class="player-goose-image" src=${PLAYER_IMAGE_MAP[i.toString()]}></img>
                     <span>${playerName}</span>
                 </div>
                 <hr>
