@@ -1,10 +1,15 @@
 :root {
     --tile-curve: 50%;
     --board-rotation: 55deg;
+
+    --font-size-large: 2em;
+    --font-size-medium: 24px;
+
+    --turn-symbol-padding-left: 32px;
 }
 
 .container {
-    margin: 0 2em;
+    margin: 0;
 }
 
 /* Lobby */
@@ -14,6 +19,7 @@
     max-width: 100%;
     width: max(50%, 80ch);
     margin: 2em 0;
+    padding: 0 1em;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -37,7 +43,7 @@
     padding: 0.2em;
 }
 
-#player-list > hr {
+#player-list-lobby > hr {
     margin: 0;
 }
 
@@ -48,7 +54,7 @@
     overflow: hidden;
 }
 
-.player-info-goose {
+.player-goose-image {
     margin-right: 1rem;
     width: 4rem;
 }
@@ -67,6 +73,37 @@
 
 /* Game */
 
+#player-list-game {
+    max-width: 24ch;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    font-size: var(--font-size-medium);
+}
+
+#player-list-game > .player-name {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0 var(--turn-symbol-padding-left);
+}
+
+.player-selected::before {
+    content: "➤";
+    color: red;
+    margin-left: calc(-1 * var(--turn-symbol-padding-left));
+    margin-right: calc(var(--turn-symbol-padding-left) - var(--font-size-medium));
+}
+
+#turn-counter {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-size: var(--font-size-medium);
+}
+
 #info-container {
     z-index: 4;
     opacity: 0;
@@ -75,7 +112,7 @@
     justify-content: center;
     align-items: center;
     max-width: 32ch;
-    top: 20rem;
+    top: 40%;
     padding: 1rem 2rem;
     margin: 0 20%;
     align-self: center;
@@ -83,7 +120,7 @@
     border-radius: 1rem;
     border: 4px solid white;
     font-weight: 500;
-    font-size: 2em;
+    font-size: var(--font-size-large);
     color: white;
     text-align: center;
     text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
@@ -101,6 +138,7 @@
 #roll-button {
     top: 10%;
     padding: 0.6rem 2.5rem;
+    font-size: var(--font-size-medium);
 }
 
 .board {
@@ -247,22 +285,25 @@
     transform: scaleX(-1) perspective(2000px) rotateX(-70deg) translateY(-50%);
 }
 
-@media screen and (min-device-width: 320px) and (max-device-width: 750px) {
+@media screen and (min-device-width: 320px) and (max-device-width: 820px) {
+    :root {
+        --font-size-large: 1em;
+    }
+
     .container {
+        margin: 0 1.5em;
         justify-content: space-evenly;
     }
 
     /* Lobby */
 
-    #player-list {
+    #player-list-lobby {
+        height: 150px;
         margin: 0;
+        overflow: scroll;
     }
 
-    .player-info > span {
-        font-size: 1em;
-    }
-
-    .player-info-goose {
+    .player-goose-image {
         width: 2rem;
     }
 
@@ -279,14 +320,13 @@
     }
 
     #info-container {
-        top: 50%;
-        font-size: 14px;
         padding: 0.6em 0.8em;
     }
 
     .board {
         flex-grow: 0;
         transform: none;
+        overflow-x: scroll;
     }
 
     .goose {
@@ -340,22 +380,38 @@
     }
 }
 
-@media screen and (min-device-width: 320px) and (max-device-width: 750px) and (orientation: landscape) {
-    #player-list {
-        height: 150px;
-        overflow: scroll;
+@media screen and (max-device-height: 720px) {
+    :root {
+        --font-size-medium: 16px;
+        --turn-symbol-padding-left: 20px;
     }
 }
 
-@media screen and (min-device-width: 320px) and (max-device-width: 750px) and (orientation: portrait) {
-    .container {
-        padding: 0;
+@media screen and (max-device-height: 440px) {
+    :root {
+        --font-size-medium: 12px;
+        --turn-symbol-padding-left: 16px;
+    }
+
+    #player-list-game {
+        width: 14ch;
+        top: 10px;
+        left: 10px;
+    }
+}
+
+@media screen and (max-device-width: 600px) {
+    :root {
+        --font-size-medium: 16px;
+        --turn-symbol-padding-left: 20px;
+    }
+
+    #player-list-game {
+        position: relative;
+        inset: 0;
     }
 
     .board {
-        width: 140%;
-        rotate: 90deg;
         margin: 0;
-        translate: -14% -6%;
     }
 }
