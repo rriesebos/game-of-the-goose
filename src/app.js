@@ -41,6 +41,10 @@ class GooseGameClient {
         if (!state || !state.G.started) {
             this.lobby = new GooseGameLobby(this.rootElement, this.client);
         }
+
+        window.addEventListener("beforeunload", async (e) => {
+            await this.lobby.leaveMatch();
+        });
     }
 
     createBoard(ruleset) {
@@ -144,8 +148,10 @@ class GooseGameClient {
 
     updatePlayerNames() {
         for (const player of this.client.matchData) {
-            if (player.name) {
+            if (player.name && player.isConnected) {
                 this.playerNames[player.id.toString()] = player.name;
+            } else {
+                delete this.playerNames[player.id.toString()];
             }
         }
 

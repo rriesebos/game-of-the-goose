@@ -2,8 +2,6 @@ import { LobbyClient } from "boardgame.io/client";
 import { GooseGame } from "./game";
 import { SERVER_URL, PLAYER_IMAGE_MAP } from "./constants";
 
-// TODO: leave button, onbeforeunload (clear session storage, redirect?)
-
 export class GooseGameLobby {
     constructor(rootElement, client) {
         this.lobbyClient = new LobbyClient({ server: SERVER_URL });
@@ -115,6 +113,13 @@ export class GooseGameLobby {
         sessionStorage.setItem("playerCredentials", playerCredentials);
     }
 
+    async leaveMatch() {
+        this.lobbyClient.leaveMatch(GooseGame.name, this.matchID, {
+            playerID: sessionStorage.getItem("playerID"),
+            credentials: sessionStorage.getItem("playerCredentials"),
+        });
+    }
+
     async validateMatch(matchID) {
         if (this.playerID) {
             return this.playerID;
@@ -167,11 +172,12 @@ export class GooseGameLobby {
 
         this.playerList.innerHTML = playerListHTML;
 
-        this.updateRoomInfo(this.playerNames.length);
+        this.updateRoomInfo();
     }
 
-    async updateRoomInfo(playerCount) {
+    async updateRoomInfo() {
         const match = await this.getMatch(this.matchID);
+        const playerCount = match.players.map((player) => player.name && player.isConnected).filter(Boolean).length;
 
         this.roomInfoContainer.innerText = `Ruleset: ${match.setupData.ruleset} — Players: ${match.players.length}`;
         this.playerCountText.innerText = `Joined players:  ${playerCount} / ${match.players.length}`;
