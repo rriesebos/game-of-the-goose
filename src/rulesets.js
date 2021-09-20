@@ -32,6 +32,7 @@ export const rulesets = {
                     }
                 },
                 text: `Leapfrog: Move in front of the next player!`,
+                // TODO: add images, e.g. image: 'image.src',
             },
 
             // Move ahead to tile 12
@@ -147,7 +148,7 @@ export const rulesets = {
 
             // Move ahead to tile 26 if the player rolled 3 and 6, and ahead to tile 53 if the player rolled 4 and 5
             9: {
-                condition: (G, ctx) => (G, ctx) => {
+                condition: (G, ctx) => {
                     const diceSum = G.dice.reduce((a, b) => a + b, 0);
                     return diceSum === 9;
                 },
