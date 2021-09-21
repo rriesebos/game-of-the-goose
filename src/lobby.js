@@ -1,6 +1,7 @@
 import { LobbyClient } from "boardgame.io/client";
 import { GooseGame } from "./game";
 import { SERVER_URL, PLAYER_IMAGE_MAP } from "./constants";
+import { rulesDescriptionHTML } from "./rulesets";
 
 export class GooseGameLobby {
     constructor(rootElement, client) {
@@ -26,6 +27,14 @@ export class GooseGameLobby {
 
     async createLobby() {
         this.rootElement.innerHTML = `
+            <div id="ruleset-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3 class="modal-title"></h3>
+                    <p class="modal-text"></p>
+                </div>
+            </div>
+
             <div class="lobby-container">
                 <div id="title-container">
                     <h2>Game of the Goose</h2>
@@ -56,10 +65,28 @@ export class GooseGameLobby {
         this.roomInfoContainer = this.rootElement.querySelector("#room-info");
         this.playerCountText = this.rootElement.querySelector("#player-count");
 
+        this.rulesetModal = document.querySelector("#ruleset-modal");
+        this.closeButton = document.querySelector("#ruleset-modal .close");
+        this.modalTitle = document.querySelector("#ruleset-modal .modal-title");
+        this.modalText = document.querySelector("#ruleset-modal .modal-text");
+
         this.playerList = this.rootElement.querySelector("#player-list-lobby");
         this.startMatchButton = this.rootElement.querySelector("#start-match-button");
         this.matchInviteLinkCopyBox = this.rootElement.querySelector(".copy-box");
         this.matchInviteLinkInput = document.querySelector("#match-invite-link");
+
+        // Close modal if the close button is pressed or when the user clicks outside of the modal content
+        this.closeButton.onclick = () => {
+            this.rulesetModal.style.visibility = "hidden";
+            this.rulesetModal.style.opacity = 0;
+        };
+
+        window.onclick = (event) => {
+            if (event.target === this.rulesetModal) {
+                this.rulesetModal.style.visibility = "hidden";
+                this.rulesetModal.style.opacity = 0;
+            }
+        };
 
         this.startMatchButton.onclick = () => this.startMatch();
         this.matchInviteLinkCopyBox.onclick = () => this.copyMatchInvite();
@@ -98,19 +125,24 @@ export class GooseGameLobby {
         // Enable start button if the player is the first player (game creator if no one leaves)
         this.startMatchButton.disabled = playerID !== "0";
 
-        const { playerCredentials } = await this.lobbyClient.joinMatch(GooseGame.name, this.matchID, {
-            playerID: playerID,
-            playerName: !this.playerName || this.playerName === "" ? "Player " + playerID : this.playerName,
-        });
+        this.lobbyClient
+            .joinMatch(GooseGame.name, this.matchID, {
+                playerID: playerID,
+                playerName: !this.playerName || this.playerName === "" ? "Player " + playerID : this.playerName,
+            })
+            .then((result) => {
+                const { playerCredentials } = result;
 
-        this.client.updateMatchID(this.matchID);
-        this.client.updatePlayerID(playerID);
-        this.client.updateCredentials(playerCredentials);
+                this.client.updateMatchID(this.matchID);
+                this.client.updatePlayerID(playerID);
+                this.client.updateCredentials(playerCredentials);
 
-        // Store current session variables
-        sessionStorage.setItem("matchID", this.matchID);
-        sessionStorage.setItem("playerID", playerID);
-        sessionStorage.setItem("playerCredentials", playerCredentials);
+                // Store current session variables
+                sessionStorage.setItem("matchID", this.matchID);
+                sessionStorage.setItem("playerID", playerID);
+                sessionStorage.setItem("playerCredentials", playerCredentials);
+            })
+            .catch(() => this.showError("Failed to join match."));
     }
 
     async validateMatch(matchID) {
@@ -127,7 +159,7 @@ export class GooseGameLobby {
         try {
             playerID = await this.getPlayerId(matchID);
         } catch (err) {
-            throw "Invalid match ID.";
+            throw `Match with ID "${matchID}" does not exist.`;
         }
 
         if (playerID === -1) {
@@ -168,19 +200,30 @@ export class GooseGameLobby {
         this.updateRoomInfo();
     }
 
+    initializeRulesetModal(ruleset) {
+        // Set ruleset modal content
+        this.modalTitle.innerText = ruleset;
+        this.modalText.innerHTML = rulesDescriptionHTML(ruleset);
+    }
+
     async updateRoomInfo() {
-        try {
-            const match = await this.getMatch(this.matchID);
-            const playerCount = match.players.map((player) => player.name && player.isConnected).filter(Boolean).length;
+        const match = await this.getMatch(this.matchID);
+        const playerCount = match.players.map((player) => player.name && player.isConnected).filter(Boolean).length;
 
-            this.roomInfoContainer.innerText = `Ruleset: ${match.setupData.ruleset} — Players: ${match.players.length}`;
-            this.playerCountText.innerText = `Joined players:  ${playerCount} / ${match.players.length}`;
+        this.roomInfoContainer.innerHTML = `Ruleset: <span id="ruleset-text">${match.setupData.ruleset}</span> — Players: ${match.players.length}`;
+        this.playerCountText.innerText = `Joined players:  ${playerCount} / ${match.players.length}`;
 
-            // Enable start button if the player is the first player (game creator if no one leaves) and the room is full
-            this.startMatchButton.disabled = this.client.playerID !== "0" || playerCount !== match.players.length;
-        } catch (error) {
-            this.showError("Match no longer exists.");
-        }
+        this.initializeRulesetModal(match.setupData.ruleset);
+
+        // Show ruleset modal when ruleset text is clicked
+        const rulesetText = this.roomInfoContainer.querySelector("#ruleset-text");
+        rulesetText.onclick = () => {
+            this.rulesetModal.style.visibility = "visible";
+            this.rulesetModal.style.opacity = 1;
+        };
+
+        // Enable start button if the player is the first player (game creator if no one leaves) and the room is full
+        this.startMatchButton.disabled = this.client.playerID !== "0" || playerCount !== match.players.length;
     }
 
     startMatch() {

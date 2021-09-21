@@ -69,6 +69,11 @@
     margin-top: 0.2em;
 }
 
+#ruleset-text {
+    text-decoration: underline solid black;
+    cursor: pointer;
+}
+
 /* Game */
 
 #player-list-game {
@@ -126,6 +131,8 @@
     text-align: center;
     text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
     transition: opacity linear 0.2s;
+    box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 0.075), 2px 2px 2px hsl(0deg 0% 0% / 0.075),
+        4px 4px 4px hsl(0deg 0% 0% / 0.075), 8px 8px 8px hsl(0deg 0% 0% / 0.06), 16px 16px 16px hsl(0deg 0% 0% / 0.06);
 }
 
 #confetti-canvas {
