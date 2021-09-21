@@ -113,13 +113,6 @@ export class GooseGameLobby {
         sessionStorage.setItem("playerCredentials", playerCredentials);
     }
 
-    async leaveMatch() {
-        this.lobbyClient.leaveMatch(GooseGame.name, this.matchID, {
-            playerID: sessionStorage.getItem("playerID"),
-            credentials: sessionStorage.getItem("playerCredentials"),
-        });
-    }
-
     async validateMatch(matchID) {
         if (this.playerID) {
             return this.playerID;
@@ -176,14 +169,18 @@ export class GooseGameLobby {
     }
 
     async updateRoomInfo() {
-        const match = await this.getMatch(this.matchID);
-        const playerCount = match.players.map((player) => player.name && player.isConnected).filter(Boolean).length;
+        try {
+            const match = await this.getMatch(this.matchID);
+            const playerCount = match.players.map((player) => player.name && player.isConnected).filter(Boolean).length;
 
-        this.roomInfoContainer.innerText = `Ruleset: ${match.setupData.ruleset} — Players: ${match.players.length}`;
-        this.playerCountText.innerText = `Joined players:  ${playerCount} / ${match.players.length}`;
+            this.roomInfoContainer.innerText = `Ruleset: ${match.setupData.ruleset} — Players: ${match.players.length}`;
+            this.playerCountText.innerText = `Joined players:  ${playerCount} / ${match.players.length}`;
 
-        // Enable start button if the player is the first player (game creator if no one leaves) and the room is full
-        this.startMatchButton.disabled = this.client.playerID !== "0" || playerCount !== match.players.length;
+            // Enable start button if the player is the first player (game creator if no one leaves) and the room is full
+            this.startMatchButton.disabled = this.client.playerID !== "0" || playerCount !== match.players.length;
+        } catch (error) {
+            this.showError("Match no longer exists.");
+        }
     }
 
     startMatch() {
@@ -204,6 +201,14 @@ export class GooseGameLobby {
     showError(errorMessage) {
         this.rootElement.innerHTML = "";
         this.rootElement.innerText = errorMessage;
-        this.rootElement.innerHTML += `<button class="button" onclick="window.location.href = '/index.html'">Back to home</button>`;
+
+        const backButton = document.createElement("button");
+        backButton.classList.add("button");
+        backButton.onclick = () => {
+            window.location.href = "/index.html";
+        };
+        backButton.innerText = "Back to home";
+
+        this.rootElement.appendChild(backButton);
     }
 }
