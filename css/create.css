@@ -15,7 +15,12 @@ select {
     width: 24px;
     height: 24px;
     margin-left: 16px;
+    fill: #777;
     cursor: pointer;
     pointer-events: all;
-    filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.2));
+}
+
+.info-icon:hover,
+.info-icon:focus {
+    fill: black;
 }
