@@ -41,8 +41,23 @@ class GooseGameClient {
             this.lobby = new GooseGameLobby(this.rootElement, this.client);
         }
 
-        window.addEventListener("beforeunload", async (e) => {
-            await this.lobby.leaveMatch();
+        // Leave the match when the page is going to be terminated
+        window.addEventListener("pagehide", (event) => {
+            const matchID = sessionStorage.getItem("matchID");
+
+            if (!matchID) {
+                sessionStorage.clear();
+                return;
+            }
+
+            const body = new URLSearchParams({
+                playerID: sessionStorage.getItem("playerID"),
+                credentials: sessionStorage.getItem("playerCredentials"),
+            });
+
+            navigator.sendBeacon(`${SERVER_URL}/games/${GooseGame.name}/${matchID}/leave`, body);
+
+            sessionStorage.clear();
         });
     }
 
