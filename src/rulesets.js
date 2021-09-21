@@ -32,6 +32,7 @@ export const rulesets = {
                     }
                 },
                 text: `Leapfrog: Move in front of the next player!`,
+                // TODO: add images, e.g. image: 'image.src',
             },
 
             // Move ahead to tile 12
@@ -147,7 +148,7 @@ export const rulesets = {
 
             // Move ahead to tile 26 if the player rolled 3 and 6, and ahead to tile 53 if the player rolled 4 and 5
             9: {
-                condition: (G, ctx) => (G, ctx) => {
+                condition: (G, ctx) => {
                     const diceSum = G.dice.reduce((a, b) => a + b, 0);
                     return diceSum === 9;
                 },
@@ -230,3 +231,40 @@ export const rulesets = {
         },
     },
 };
+
+export function rulesDescriptionHTML(ruleset) {
+    const rules = rulesets[ruleset];
+
+    let description = "";
+
+    description += `The game is played with <b>${rules.DICE_COUNT} dice</b>. Players take turns rolling the dice in a clock-wise fashion.
+    All geese start on tile 0, and move according to the sum of the rolled dice.`;
+
+    description += "<br><br>";
+
+    description += `The first player to land exactly on <b>tile ${rules.MAX_MOVE_COUNT}</b> wins the game.
+    If a player goes past ${rules.MAX_MOVE_COUNT}, they have to move backwards for the remaining number of moves.`;
+
+    if (Object.values(rules.TILE_EVENT_MAP).some((value) => value.endGameIfAllStuck)) {
+        description += " If all players are stuck, the game ends in a draw.";
+    }
+
+    description += "<br><br>";
+
+    if (rules.MOVE_AGAIN_TILES && rules.MOVE_AGAIN_TILES.length !== 0) {
+        description += `If a player lands on <b>${rules.MOVE_AGAIN_TILES.join(
+            ", "
+        )}</b> (marked with <span class="red">red</span> numbers), they move again by the sum of the dice.`;
+    }
+
+    description += "<br><br>";
+
+    description += `There are <b>obstacles</b> (or hazards) spread across the board. The obstacle tiles, along with the corresponding consequences, are as follows:`;
+    description += "<br><br>";
+    for (const [key, value] of Object.entries(rules.TILE_EVENT_MAP)) {
+        description += `<b>${key}</b> - ${value.text}`;
+        description += "<br>";
+    }
+
+    return description;
+}

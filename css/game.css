@@ -4,8 +4,6 @@
 
     --font-size-large: 2em;
     --font-size-medium: 24px;
-
-    --turn-symbol-padding-left: 32px;
 }
 
 .container {
@@ -71,10 +69,15 @@
     margin-top: 0.2em;
 }
 
+#ruleset-text {
+    text-decoration: underline solid black;
+    cursor: pointer;
+}
+
 /* Game */
 
 #player-list-game {
-    max-width: 24ch;
+    max-width: 22ch;
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -83,18 +86,21 @@
     font-size: var(--font-size-medium);
 }
 
-#player-list-game > .player-name {
+.player-info-game {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    padding: 0 var(--turn-symbol-padding-left);
+}
+
+.player-info-game > .player-goose-image {
+    width: 2rem;
+    margin-right: 0.2rem;
+    vertical-align: text-bottom;
 }
 
 .player-selected::before {
     content: "➤";
     color: red;
-    margin-left: calc(-1 * var(--turn-symbol-padding-left));
-    margin-right: calc(var(--turn-symbol-padding-left) - var(--font-size-medium));
 }
 
 #turn-counter {
@@ -125,6 +131,8 @@
     text-align: center;
     text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
     transition: opacity linear 0.2s;
+    box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 0.075), 2px 2px 2px hsl(0deg 0% 0% / 0.075),
+        4px 4px 4px hsl(0deg 0% 0% / 0.075), 8px 8px 8px hsl(0deg 0% 0% / 0.06), 16px 16px 16px hsl(0deg 0% 0% / 0.06);
 }
 
 #confetti-canvas {
@@ -324,6 +332,7 @@
     }
 
     .board {
+        margin: 0;
         flex-grow: 0;
         transform: none;
         overflow-x: scroll;
@@ -380,23 +389,26 @@
     }
 }
 
-@media screen and (max-device-height: 720px) {
-    :root {
-        --font-size-medium: 16px;
-        --turn-symbol-padding-left: 20px;
-    }
-}
-
-@media screen and (max-device-height: 440px) {
+@media screen and (max-device-height: 680px) {
     :root {
         --font-size-medium: 12px;
         --turn-symbol-padding-left: 16px;
     }
 
     #player-list-game {
-        width: 14ch;
+        width: 17ch;
         top: 10px;
         left: 10px;
+    }
+
+    .player-info-game > .player-goose-image {
+        width: 1.5rem;
+        margin-right: 0;
+    }
+
+    .board {
+        left: 8em;
+        margin-left: 8em;
     }
 }
 
