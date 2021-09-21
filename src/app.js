@@ -150,19 +150,23 @@ class GooseGameClient {
         // TODO: add event tile images
 
         const playerListContainer = this.rootElement.querySelector("#player-list-game");
+        let playerListHTML = "";
         for (const player of this.client.matchData) {
-            const span = document.createElement("span");
-            span.classList.add("player-name");
-            span.innerText = player.name;
+            let playerName = player.name;
 
             if (player.id.toString() === this.client.playerID) {
-                span.style.fontWeight = "bold";
+                playerName = `<b>${playerName}</b>`;
             }
 
-            span.dataset.playerId = player.id;
-
-            playerListContainer.appendChild(span);
+            playerListHTML += `
+                <div class="player-info-game" data-player-id="${player.id}">
+                    <img class="player-goose-image" src=${PLAYER_IMAGE_MAP[player.id.toString()]}></img>
+                    <span class="player-name">${playerName}</span>
+                </div>
+            `;
         }
+
+        playerListContainer.innerHTML = playerListHTML;
 
         this.turnCounter = this.rootElement.querySelector("#turn-counter");
 
@@ -184,15 +188,19 @@ class GooseGameClient {
     }
 
     updatePlayerNames() {
-        const playerNames = {};
+        if (!this.client.matchData) {
+            return;
+        }
+
+        const playerNames = [];
         for (const player of this.client.matchData) {
             if (player.name && player.isConnected) {
-                playerNames[player.id.toString()] = player.name;
+                playerNames.push(player.name);
             }
         }
 
-        if (this.lobby) {
-            this.lobby.updatePlayers(Object.values(playerNames));
+        if (this.lobby && playerNames.length !== 0) {
+            this.lobby.updatePlayers(playerNames);
         }
     }
 
