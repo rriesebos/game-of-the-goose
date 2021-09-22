@@ -1,7 +1,7 @@
 import { Client } from "boardgame.io/client";
 import { SocketIO } from "boardgame.io/multiplayer";
 import { GooseGame } from "./game";
-import { rulesets } from "./rulesets";
+import { rulesets, rulesDescriptionHTML } from "./rulesets";
 import { SERVER_URL, PLAYER_IMAGE_MAP } from "./constants";
 
 import { GooseGameLobby } from "./lobby";
@@ -65,8 +65,27 @@ class GooseGameClient {
         this.boardVisible = true;
 
         this.rootElement.innerHTML = `
+            <div id="ruleset-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3 class="modal-title"></h3>
+                    <p class="modal-text"></p>
+                </div>
+            </div>
+
             <div id="player-list-game"></div>
-            <span id="turn-counter">Turn: 1</span>
+            <div id="game-info">
+                <span id="turn-counter">Turn: 1</span>
+                <span id="rules">Rules?</span>
+                <div id="tooltip">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 122.88" class="info-icon">
+                        <path
+                            d="M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM59.12,36a8,8,0,0,1,.61-3.16,7.82,7.82,0,0,1,1.8-2.63,8.33,8.33,0,0,1,2.62-1.79,8.08,8.08,0,0,1,6.11,0,8.06,8.06,0,0,1,2.58,1.79,7.83,7.83,0,0,1,1.77,2.63A8.38,8.38,0,0,1,75.2,36a8.15,8.15,0,0,1-.59,3.1,8.23,8.23,0,0,1-1.76,2.65,8.15,8.15,0,0,1-2.59,1.82,7.72,7.72,0,0,1-3.05.6,8,8,0,0,1-3.12-.6,7.84,7.84,0,0,1-2.61-1.8,8.07,8.07,0,0,1-1.77-2.64A8.3,8.3,0,0,1,59.12,36Zm3.09,47.8-.17.63-.12.49-.05.34,0,.27a2,2,0,0,0,.09.64v0a1.09,1.09,0,0,0,.23.41.86.86,0,0,0,.35.23,1.55,1.55,0,0,0,.55.09,2.74,2.74,0,0,0,1.46-.63,14.6,14.6,0,0,0,2.15-2.06,36,36,0,0,0,2.57-3.3c.89-1.26,1.82-2.71,2.79-4.33a.37.37,0,0,1,.5-.13l3.28,2.44a.36.36,0,0,1,.09.5,56.84,56.84,0,0,1-4.58,6.87,30.35,30.35,0,0,1-4.73,4.89l0,0a18.55,18.55,0,0,1-4.92,2.92,14.15,14.15,0,0,1-5.19,1,13.63,13.63,0,0,1-4.07-.55,7.92,7.92,0,0,1-3-1.66,7.1,7.1,0,0,1-1.86-2.72,9.92,9.92,0,0,1-.61-3.62c0-.45,0-.92.08-1.42s.14-1,.25-1.58v0c.1-.54.25-1.15.43-1.82s.41-1.43.67-2.26L54.1,61.61l.47-1.67c.12-.47.22-.88.3-1.24a8.43,8.43,0,0,0,.15-.9,5.75,5.75,0,0,0,.06-.77,2.9,2.9,0,0,0-.2-1.09v0a2.49,2.49,0,0,0-.57-.81,2.68,2.68,0,0,0-.94-.55,4.15,4.15,0,0,0-1.28-.19H47.45a.37.37,0,0,1-.37-.36l0-.13,1.22-4.43a.37.37,0,0,1,.36-.27l23.67-.75a.38.38,0,0,1,.38.36l0,.12L62.21,83.78ZM97,25.88a50.31,50.31,0,1,0,14.72,35.56A50.16,50.16,0,0,0,97,25.88Z"
+                        />
+                    </svg>
+                    <span id="tooltip-text"></span>
+                </div>
+            </div>
 
             <div id="info-container"></div>
             <canvas id="confetti-canvas"></canvas>
@@ -141,14 +160,31 @@ class GooseGameClient {
             </div>
         `;
 
-        // Add class to move again tiles
-        for (const tile of rulesets[ruleset].MOVE_AGAIN_TILES) {
-            const moveAgainTile = this.rootElement.querySelector(`[data-id='${tile}']`);
-            moveAgainTile.classList.add("move-again");
-        }
-
         // TODO: add event tile images
 
+        this.turnCounter = this.rootElement.querySelector("#turn-counter");
+
+        this.infoContainer = this.rootElement.querySelector("#info-container");
+        this.rollButton = this.rootElement.querySelector("#roll-button");
+        this.spaceElement = this.rootElement.querySelector("#space");
+
+        this.confetti = new ConfettiGenerator({
+            target: "confetti-canvas",
+            max: 80,
+            size: 1.6,
+        });
+
+        this.rollButton.onclick = () => {
+            this.hideInfoText();
+            this.client.moves.rollDice();
+        };
+
+        this.initializePlayerList();
+        this.initializeTiles(ruleset);
+        this.initializeRulesModal(ruleset);
+    }
+
+    initializePlayerList() {
         const playerListContainer = this.rootElement.querySelector("#player-list-game");
         let playerListHTML = "";
         for (const player of this.client.matchData) {
@@ -167,23 +203,68 @@ class GooseGameClient {
         }
 
         playerListContainer.innerHTML = playerListHTML;
+    }
 
-        this.turnCounter = this.rootElement.querySelector("#turn-counter");
+    initializeTiles(ruleset) {
+        const tooltip = this.rootElement.querySelector("#tooltip");
+        const tooltipText = this.rootElement.querySelector("#tooltip-text");
 
-        this.infoContainer = this.rootElement.querySelector("#info-container");
-        this.rollButton = this.rootElement.querySelector("#roll-button");
-        this.spaceElement = this.rootElement.querySelector("#space");
+        // Add class and mouse hover events to move again tiles
+        for (const tile of rulesets[ruleset].MOVE_AGAIN_TILES) {
+            const moveAgainTile = this.rootElement.querySelector(`[data-id='${tile}']`);
+            moveAgainTile.classList.add("move-again");
 
-        this.confetti = new ConfettiGenerator({
-            target: "confetti-canvas",
-            max: 80,
-            size: 1.6,
-        });
+            moveAgainTile.addEventListener("mouseover", (event) => {
+                tooltipText.innerText = `Move again for the sum of the dice.`;
+                tooltip.style.visibility = "visible";
+            });
 
-        this.rollButton.onclick = () => {
-            this.hideInfoText();
+            moveAgainTile.addEventListener("mouseout", (event) => {
+                tooltip.style.visibility = "hidden";
+            });
+        }
 
-            this.client.moves.rollDice();
+        // Add mouse hover events to event tiles
+        for (const [tile, tileEvent] of Object.entries(rulesets[ruleset].TILE_EVENT_MAP)) {
+            const eventTile = this.rootElement.querySelector(`[data-id='${tile}']`);
+
+            eventTile.addEventListener("mouseover", (event) => {
+                tooltipText.innerText = tileEvent.text;
+                tooltip.style.visibility = "visible";
+            });
+
+            eventTile.addEventListener("mouseout", (event) => {
+                tooltip.style.visibility = "hidden";
+            });
+        }
+    }
+
+    initializeRulesModal(ruleset) {
+        const rulesText = this.rootElement.querySelector("#rules");
+        const rulesetModal = this.rootElement.querySelector("#ruleset-modal");
+        const closeButton = this.rootElement.querySelector("#ruleset-modal .close");
+        const modalTitle = this.rootElement.querySelector("#ruleset-modal .modal-title");
+        const modalText = this.rootElement.querySelector("#ruleset-modal .modal-text");
+
+        modalTitle.innerText = ruleset;
+        modalText.innerHTML = rulesDescriptionHTML(ruleset);
+
+        rulesText.onclick = () => {
+            rulesetModal.style.visibility = "visible";
+            rulesetModal.style.opacity = 1;
+        };
+
+        // Close modal if the close button is pressed or when the user clicks outside of the modal content
+        closeButton.onclick = () => {
+            rulesetModal.style.visibility = "hidden";
+            rulesetModal.style.opacity = 0;
+        };
+
+        window.onclick = (event) => {
+            if (event.target === rulesetModal) {
+                rulesetModal.style.visibility = "hidden";
+                rulesetModal.style.opacity = 0;
+            }
         };
     }
 
@@ -250,10 +331,10 @@ class GooseGameClient {
         // Update turn counter
         this.turnCounter.innerText = `Turn: ${ctx.turn}`;
 
-        // Clear all tiles
-        const tiles = this.rootElement.querySelectorAll(".tile");
-        tiles.forEach((tile) => {
-            tile.innerHTML = `<span>${tile.dataset.id}</span>`;
+        // Clear goose images from all tiles
+        const tiles = this.rootElement.querySelectorAll(".goose");
+        tiles.forEach((goose) => {
+            goose.remove();
         });
 
         const spacing = 80 / ctx.numPlayers;
