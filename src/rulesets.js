@@ -71,6 +71,7 @@ export const rulesets = {
                     return diceSum === 1 || diceSum === 2;
                 },
                 event: (G, ctx) => {
+                    G.players[ctx.currentPlayer].moveList = [];
                     ctx.events.endTurn({ next: ctx.currentPlayer });
                 },
                 text: `Dice: You threw 1 or 2, throw again!`,

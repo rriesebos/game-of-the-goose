@@ -1,7 +1,8 @@
 import { LobbyClient } from "boardgame.io/client";
 import { GooseGame } from "./game";
-import { SERVER_URL, PLAYER_IMAGE_MAP } from "./constants";
+import { PLAYER_IMAGE_MAP } from "./constants";
 import { rulesDescriptionHTML } from "./rulesets";
+import { SERVER_URL } from "./constants";
 
 export class GooseGameLobby {
     constructor(rootElement, client) {
@@ -92,8 +93,7 @@ export class GooseGameLobby {
         this.matchInviteLinkCopyBox.onclick = () => this.copyMatchInvite();
 
         // Update match invite link
-        // TODO: update url
-        this.matchInviteLinkInput.value = `localhost:1234/index.html?matchID=${this.matchID}`;
+        this.matchInviteLinkInput.value = `${SERVER_URL}/index.html?matchID=${this.matchID}`;
     }
 
     getMatch(matchID) {
