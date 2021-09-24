@@ -155,15 +155,15 @@
 
 #info-container {
     z-index: 4;
-    opacity: 0;
-    position: absolute;
-    display: flex;
+    position: fixed;
+    height: revert;
     justify-content: center;
-    align-items: center;
+}
+
+#info-container > #info-text {
+    opacity: 0;
     max-width: 32ch;
-    top: 40%;
     padding: 1rem 2rem;
-    margin: 0 20%;
     align-self: center;
     background-color: rgba(0, 0, 0, 0.75);
     border-radius: 1rem;
@@ -173,9 +173,15 @@
     color: white;
     text-align: center;
     text-shadow: 0 0.04em 0.04em rgba(0, 0, 0, 0.35);
-    transition: opacity linear 0.2s;
     box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 0.075), 2px 2px 2px hsl(0deg 0% 0% / 0.075),
         4px 4px 4px hsl(0deg 0% 0% / 0.075), 8px 8px 8px hsl(0deg 0% 0% / 0.06), 16px 16px 16px hsl(0deg 0% 0% / 0.06);
+    transition: opacity linear 0.2s;
+}
+
+#info-container > #play-again-button {
+    opacity: 0;
+    --button-shadow-color: hsl(0deg 60% 50% / 0.25);
+    transition: opacity linear 0.2s;
 }
 
 #confetti-canvas {

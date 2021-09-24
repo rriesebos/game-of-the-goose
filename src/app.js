@@ -87,7 +87,11 @@ class GooseGameClient {
                 </div>
             </div>
 
-            <div id="info-container"></div>
+            <div id="info-container" class="container">
+                <div id="info-text"></div>
+                <button id="play-again-button" class="button">Return to lobby</button>
+            </div>
+
             <canvas id="confetti-canvas"></canvas>
             <button id="roll-button" class="button" disabled><span>Roll</span></button>
             
@@ -163,9 +167,9 @@ class GooseGameClient {
         // TODO: add event tile images
 
         this.turnCounter = this.rootElement.querySelector("#turn-counter");
-
-        this.infoContainer = this.rootElement.querySelector("#info-container");
         this.rollButton = this.rootElement.querySelector("#roll-button");
+        this.infoText = this.rootElement.querySelector("#info-text");
+        this.playAgainButton = this.rootElement.querySelector("#play-again-button");
         this.spaceElement = this.rootElement.querySelector("#space");
 
         this.confetti = new ConfettiGenerator({
@@ -173,6 +177,14 @@ class GooseGameClient {
             max: 80,
             size: 1.6,
         });
+
+        this.playAgainButton.onclick = async () => {
+            this.lastTurn = 0;
+            this.rollingDice = false;
+            this.boardVisible = false;
+
+            await this.lobby.playAgain();
+        };
 
         this.rollButton.onclick = () => {
             this.hideInfoText();
@@ -382,8 +394,8 @@ class GooseGameClient {
 
         if (ctx.gameover) {
             this.rollButton.disabled = true;
+            this.playAgainButton.style.opacity = 1;
 
-            // TODO: add replay button?
             if (ctx.gameover.winner) {
                 this.confetti.render();
                 this.showInfoText(`${ctx.gameover.winner} won!`, -1);
@@ -444,8 +456,8 @@ class GooseGameClient {
     }
 
     async showInfoText(text, duration) {
-        this.infoContainer.innerText = text;
-        this.infoContainer.style.opacity = 1;
+        this.infoText.innerText = text;
+        this.infoText.style.opacity = 1;
 
         if (duration >= 0) {
             await this.timer(duration);
@@ -454,7 +466,7 @@ class GooseGameClient {
     }
 
     hideInfoText() {
-        this.infoContainer.style.opacity = 0;
+        this.infoText.style.opacity = 0;
     }
 }
 
