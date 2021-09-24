@@ -4,6 +4,11 @@
 
     --font-size-large: 2em;
     --font-size-medium: 24px;
+    --font-size-small: 1.2rem;
+
+    --board-background-color: #ffde82;
+    --board-border-color: #8e6e53;
+    --tile-color: #058c42;
 }
 
 .container {
@@ -90,6 +95,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    text-align: left;
 }
 
 .player-info-game > .player-goose-image {
@@ -100,14 +106,51 @@
 
 .player-selected::before {
     content: "➤";
-    color: red;
+    color: var(--button-color);
+    text-shadow: 0.02em 0.02em 0.02em rgba(0, 0, 0, 0.35);
 }
 
-#turn-counter {
+#game-info {
     position: absolute;
     top: 24px;
     right: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     font-size: var(--font-size-medium);
+}
+
+.info-icon {
+    width: 16px;
+    height: 16px;
+}
+
+#rules {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#tooltip {
+    position: relative;
+    z-index: 4;
+    visibility: hidden;
+    width: 18ch;
+    margin-left: -9ch;
+    margin-top: 1em;
+    padding: 0.4em 0.8em;
+    padding-left: 2em;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    text-align: left;
+    font-size: var(--font-size-small);
+    border-radius: 6px;
+}
+
+#tooltip > .info-icon {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    fill: white;
 }
 
 #info-container {
@@ -158,8 +201,8 @@
     column-gap: 8px;
     padding: 20px;
     margin: -2% 11%;
-    background: #ffde82;
-    border: 12px solid #8e6e53;
+    background: var(--board-background-color);
+    border: 12px solid var(--board-border-color);
     border-radius: 2%;
     transform-style: preserve-3d;
     transform: perspective(2000px) rotateX(var(--board-rotation));
@@ -173,7 +216,7 @@
     align-items: center;
     font-size: max(2vw, 2vh);
     grid-column: span 8;
-    transform: perspective(2000px) rotateX(-20deg) translateY(-25%);
+    transform: perspective(2000px) rotateX(-20deg) translateY(-6%);
 }
 
 .dice-outer {
@@ -186,7 +229,7 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 4px;
-    background: #058c42;
+    background: var(--tile-color);
     color: black;
     border: 1px solid black;
     font-size: max(1.3vw, 1.3vh);
@@ -321,6 +364,11 @@
 
     /* Game */
 
+    #game-info {
+        top: 16px;
+        right: 16px;
+    }
+
     #roll-button {
         top: 0;
         margin: 0;
@@ -392,17 +440,18 @@
 @media screen and (max-device-height: 680px) {
     :root {
         --font-size-medium: 12px;
+        --font-size-small: 0.5em;
         --turn-symbol-padding-left: 16px;
     }
 
     #player-list-game {
         width: 17ch;
-        top: 10px;
-        left: 10px;
+        top: 16px;
+        left: 4px;
     }
 
     .player-info-game > .player-goose-image {
-        width: 1.5rem;
+        width: 1.3rem;
         margin-right: 0;
     }
 
@@ -415,6 +464,7 @@
 @media screen and (max-device-width: 600px) {
     :root {
         --font-size-medium: 16px;
+        --font-size-small: 0.75em;
         --turn-symbol-padding-left: 20px;
     }
 
