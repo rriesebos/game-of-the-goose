@@ -1,3 +1,5 @@
+export const SERVER_URL = process.env.SERVER_URL || window.location.origin;
+
 import player0Img from "../img/player0.svg";
 import player1Img from "../img/player1.svg";
 import player2Img from "../img/player2.svg";

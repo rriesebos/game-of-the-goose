@@ -2,8 +2,7 @@ import { LobbyClient } from "boardgame.io/client";
 import { GooseGame } from "./game";
 import { PLAYER_IMAGE_MAP } from "./constants";
 import { rulesDescriptionHTML } from "./rulesets";
-
-const SERVER_URL = window.location.origin;
+import { SERVER_URL } from "./constants";
 
 export class GooseGameLobby {
     constructor(rootElement, client) {
