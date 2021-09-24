@@ -1,7 +1,8 @@
 import { LobbyClient } from "boardgame.io/client";
 import { GooseGame } from "./game";
-import { SERVER_URL, PLAYER_IMAGE_MAP } from "./constants";
+import { PLAYER_IMAGE_MAP } from "./constants";
 import { rulesDescriptionHTML } from "./rulesets";
+import { SERVER_URL } from "./constants";
 
 export class GooseGameLobby {
     constructor(rootElement, client) {
@@ -25,7 +26,7 @@ export class GooseGameLobby {
             .catch((err) => this.showError(err));
     }
 
-    async createLobby() {
+    createLobby() {
         this.rootElement.innerHTML = `
             <div id="ruleset-modal" class="modal">
                 <div class="modal-content">
@@ -92,8 +93,7 @@ export class GooseGameLobby {
         this.matchInviteLinkCopyBox.onclick = () => this.copyMatchInvite();
 
         // Update match invite link
-        // TODO: update url
-        this.matchInviteLinkInput.value = `localhost:1234/index.html?matchID=${this.matchID}`;
+        this.matchInviteLinkInput.value = `${window.location.origin}/index.html?matchID=${this.matchID}`;
     }
 
     getMatch(matchID) {
@@ -143,6 +143,49 @@ export class GooseGameLobby {
                 sessionStorage.setItem("playerCredentials", playerCredentials);
             })
             .catch(() => this.showError("Failed to join match."));
+    }
+
+    async playAgain() {
+        const playerID = sessionStorage.getItem("playerID");
+        const credentials = sessionStorage.getItem("playerCredentials");
+
+        const { nextMatchID } = await this.lobbyClient.playAgain(GooseGame.name, this.matchID, {
+            playerID: playerID,
+            credentials: credentials,
+        });
+
+        // Leave old (finished) match
+        await this.leaveMatch();
+
+        // Update match id, create lobby (HTML)
+        this.matchID = nextMatchID;
+        this.createLobby();
+
+        // Join new match
+        await this.joinMatch(playerID);
+
+        // Replace old match ID in the URL
+        if (window.history.replaceState) {
+            window.history.replaceState({}, null, `${window.location.origin}/game.html?matchID=${this.matchID}`);
+        }
+    }
+
+    async leaveMatch() {
+        const playerID = sessionStorage.getItem("playerID");
+        const credentials = sessionStorage.getItem("playerCredentials");
+
+        await this.lobbyClient.leaveMatch(GooseGame.name, this.matchID, {
+            playerID: playerID,
+            credentials: credentials,
+        });
+    }
+
+    startMatch() {
+        if (!this.matchID) {
+            return;
+        }
+
+        this.client.moves.startGame(this.playerNames);
     }
 
     async validateMatch(matchID) {
@@ -224,14 +267,6 @@ export class GooseGameLobby {
 
         // Enable start button if the player is the first player (game creator if no one leaves) and the room is full
         this.startMatchButton.disabled = this.client.playerID !== "0" || playerCount !== match.players.length;
-    }
-
-    startMatch() {
-        if (!this.matchID) {
-            return;
-        }
-
-        this.client.moves.startGame(this.playerNames);
     }
 
     copyMatchInvite() {
