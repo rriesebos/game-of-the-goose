@@ -95,8 +95,7 @@ export class GooseGameLobby {
         this.matchInviteLinkCopyBox.onclick = () => this.copyMatchInvite();
 
         // Update match invite link
-        // TODO: update url
-        this.matchInviteLinkInput.value = `localhost:1234/index.html?matchID=${this.matchID}`;
+        this.matchInviteLinkInput.value = `${SERVER_URL}/index.html?matchID=${this.matchID}`;
     }
 
     getMatch(matchID) {
