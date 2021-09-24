@@ -4,8 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "parcel *.html --open",
-        "serve": "node -r esm src/server.js",
+        "start": "node -r esm src/server.js",
+        "build": "parcel build *.html --no-minify --out-dir build",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "browserslist": "defaults and supports async-functions",
@@ -16,6 +16,7 @@
         "boardgame.io": "^0.47.1",
         "confetti-js": "0.0.18",
         "esm": "^3.2.25",
+        "koa-static": "^5.0.0",
         "src": "^1.1.2"
     },
     "devDependencies": {

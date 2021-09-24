@@ -2,7 +2,7 @@ import { Client } from "boardgame.io/client";
 import { SocketIO } from "boardgame.io/multiplayer";
 import { GooseGame } from "./game";
 import { rulesets, rulesDescriptionHTML } from "./rulesets";
-import { SERVER_URL, PLAYER_IMAGE_MAP } from "./constants";
+import { PLAYER_IMAGE_MAP } from "./constants";
 
 import { GooseGameLobby } from "./lobby";
 
@@ -11,6 +11,9 @@ import ConfettiGenerator from "confetti-js";
 
 const INFO_TEXT_DURATION_SHORT = 2000;
 const INFO_TEXT_DURATION_LONG = 4000;
+
+const { protocol, hostname, port } = window.location;
+const SERVER_URL = `${protocol}//${hostname}:${port}`;
 
 class GooseGameClient {
     constructor(rootElement, { matchID, playerID, credentials }) {

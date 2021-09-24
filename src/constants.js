@@ -1,5 +1,3 @@
-export const SERVER_URL = "http://localhost:8000";
-
 import player0Img from "../img/player0.svg";
 import player1Img from "../img/player1.svg";
 import player2Img from "../img/player2.svg";
