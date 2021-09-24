@@ -95,6 +95,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    text-align: left;
 }
 
 .player-info-game > .player-goose-image {
