@@ -3,8 +3,7 @@ import { GooseGame } from "./game";
 import { PLAYER_IMAGE_MAP } from "./constants";
 import { rulesDescriptionHTML } from "./rulesets";
 
-const { protocol, hostname, port } = window.location;
-const SERVER_URL = `${protocol}//${hostname}:${port}`;
+const SERVER_URL = window.location.origin;
 
 export class GooseGameLobby {
     constructor(rootElement, client) {

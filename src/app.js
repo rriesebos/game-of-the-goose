@@ -12,8 +12,7 @@ import ConfettiGenerator from "confetti-js";
 const INFO_TEXT_DURATION_SHORT = 2000;
 const INFO_TEXT_DURATION_LONG = 4000;
 
-const { protocol, hostname, port } = window.location;
-const SERVER_URL = `${protocol}//${hostname}:${port}`;
+const SERVER_URL = window.location.origin;
 
 class GooseGameClient {
     constructor(rootElement, { matchID, playerID, credentials }) {
