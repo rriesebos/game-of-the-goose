@@ -4,7 +4,7 @@
     "description": "",
     "scripts": {
         "start": "node -r esm src/server.js",
-        "build": "parcel build *.html --out-dir build",
+        "build": "parcel build *.html --out-dir build --no-source-maps",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "browserslist": "defaults and supports async-functions",
