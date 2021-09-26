@@ -19,9 +19,9 @@ export class GooseGameLobby {
         this.playerName = sessionStorage.getItem("playerName");
 
         this.validateMatch(this.matchID)
-            .then((playerID) => {
+            .then(async (playerID) => {
+                await this.joinMatch(playerID);
                 this.createLobby();
-                this.joinMatch(playerID);
             })
             .catch((err) => this.showError(err));
     }
@@ -122,27 +122,19 @@ export class GooseGameLobby {
             return;
         }
 
-        // Enable start button if the player is the first player (game creator if no one leaves)
-        this.startMatchButton.disabled = playerID !== "0";
+        const { playerCredentials } = await this.lobbyClient.joinMatch(GooseGame.name, this.matchID, {
+            playerID: playerID,
+            playerName: !this.playerName || this.playerName === "" ? "Player " + playerID : this.playerName,
+        });
 
-        this.lobbyClient
-            .joinMatch(GooseGame.name, this.matchID, {
-                playerID: playerID,
-                playerName: !this.playerName || this.playerName === "" ? "Player " + playerID : this.playerName,
-            })
-            .then((result) => {
-                const { playerCredentials } = result;
+        this.client.updateMatchID(this.matchID);
+        this.client.updatePlayerID(playerID);
+        this.client.updateCredentials(playerCredentials);
 
-                this.client.updateMatchID(this.matchID);
-                this.client.updatePlayerID(playerID);
-                this.client.updateCredentials(playerCredentials);
-
-                // Store current session variables
-                sessionStorage.setItem("matchID", this.matchID);
-                sessionStorage.setItem("playerID", playerID);
-                sessionStorage.setItem("playerCredentials", playerCredentials);
-            })
-            .catch(() => this.showError("Failed to join match."));
+        // Store current session variables
+        sessionStorage.setItem("matchID", this.matchID);
+        sessionStorage.setItem("playerID", playerID);
+        sessionStorage.setItem("playerCredentials", playerCredentials);
     }
 
     async playAgain() {
