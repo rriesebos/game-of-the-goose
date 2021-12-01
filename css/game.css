@@ -179,6 +179,7 @@
 }
 
 #info-container > #play-again-button {
+    visibility: hidden;
     opacity: 0;
     --button-shadow-color: hsl(0deg 60% 50% / 0.25);
     transition: opacity linear 0.2s;
