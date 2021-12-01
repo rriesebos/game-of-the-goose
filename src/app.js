@@ -394,6 +394,7 @@ class GooseGameClient {
 
         if (ctx.gameover) {
             this.rollButton.disabled = true;
+            this.playAgainButton.style.visibility = "visible";
             this.playAgainButton.style.opacity = 1;
 
             if (ctx.gameover.winner) {
