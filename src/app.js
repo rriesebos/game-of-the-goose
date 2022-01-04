@@ -458,6 +458,7 @@ class GooseGameClient {
 
     async showInfoText(text, duration) {
         this.infoText.innerText = text;
+        this.infoText.style.visibility = "visible";
         this.infoText.style.opacity = 1;
 
         if (duration >= 0) {
@@ -467,6 +468,7 @@ class GooseGameClient {
     }
 
     hideInfoText() {
+        this.infoText.style.visibility = "hidden";
         this.infoText.style.opacity = 0;
     }
 }
