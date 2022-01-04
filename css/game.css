@@ -162,6 +162,7 @@
     position: fixed;
     height: revert;
     justify-content: center;
+    pointer-events: none;
 }
 
 #info-container > #info-text {
@@ -180,6 +181,7 @@
     box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 0.075), 2px 2px 2px hsl(0deg 0% 0% / 0.075),
         4px 4px 4px hsl(0deg 0% 0% / 0.075), 8px 8px 8px hsl(0deg 0% 0% / 0.06), 16px 16px 16px hsl(0deg 0% 0% / 0.06);
     transition: opacity linear 0.2s;
+    pointer-events: auto;
 }
 
 #info-container > #play-again-button {
@@ -187,6 +189,7 @@
     opacity: 0;
     --button-shadow-color: hsl(0deg 60% 50% / 0.25);
     transition: opacity linear 0.2s;
+    pointer-events: auto;
 }
 
 #confetti-canvas {
