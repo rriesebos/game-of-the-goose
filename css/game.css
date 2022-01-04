@@ -74,6 +74,10 @@
     margin-top: 0.2em;
 }
 
+#ruleset-modal {
+    z-index: 5;
+}
+
 #ruleset-text {
     text-decoration: underline solid black;
     cursor: pointer;
@@ -224,12 +228,12 @@
     align-items: center;
     font-size: max(2vw, 2vh);
     grid-column: span 8;
-    transform: perspective(2000px) rotateX(-20deg) translateY(-6%);
+    transform: rotateX(-47.5deg) translateZ(11vh);
+    transform-style: preserve-3d;
 }
 
-.dice-outer {
-    z-index: 2;
-    margin-left: 2em;
+#space > * + * {
+    margin-left: 3em;
 }
 
 .tile {
@@ -392,6 +396,10 @@
         flex-grow: 0;
         transform: none;
         overflow-x: scroll;
+    }
+
+    #space {
+        transform: none;
     }
 
     .goose {
